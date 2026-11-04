@@ -1,0 +1,55 @@
+# operobot2 stack (docs/06-deploy.md): PostgreSQL + API + Caddy (web dist + /api proxy).
+# On the dtwin VPS the edge Caddy terminates TLS for operobot2.dtwin.uz and proxies to operobot2-web:80.
+services:
+  operobot2-db:
+    image: postgres:17-alpine
+    container_name: operobot2-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ob2
+      POSTGRES_DB: ob2
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD .env da bo'lsin}
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks: [internal]
+    mem_limit: 300m
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ob2 -d ob2"]
+      interval: 5s
+      retries: 20
+
+  operobot2-api:
+    build: ./api
+    image: operobot2-api:latest
+    container_name: operobot2-api
+    restart: unless-stopped
+    depends_on:
+      operobot2-db: { condition: service_healthy }
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://ob2:${DB_PASSWORD}@operobot2-db:5432/ob2
+      HOST: 0.0.0.0
+      PORT: "18300"
+      REVISION: ${REVISION:-dev}
+    networks: [internal]
+    mem_limit: 256m
+
+  operobot2-web:
+    image: caddy:2-alpine
+    container_name: operobot2-web
+    restart: unless-stopped
+    depends_on: [operobot2-api]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./dist:/srv:ro
+    networks: [internal, edge]
+    mem_limit: 64m
+
+volumes:
+  db:
+
+networks:
+  internal: {}
+  edge:
+    external: true
+    name: ${EDGE_NETWORK:-dtwin-prod_default}
