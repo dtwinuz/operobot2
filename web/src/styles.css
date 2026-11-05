@@ -52,7 +52,7 @@ code, pre, .o2-mono { font-family: var(--mono); }
 .o2-tag.acc, .o2-tag.st-connected, .o2-tag.camp-running, .o2-tag.cs-dialing, .o2-tag.cs-answered { background: rgb(var(--acc) / .13); color: rgb(var(--acc)); }
 .o2-tag.sec, .o2-tag.st-demo { background: rgb(var(--sec) / .13); color: rgb(var(--sec)); }
 .o2-tag.ok, .o2-tag.cs-connected, .o2-tag.inv-paid, .o2-tag.camp-done { background: rgb(var(--ok) / .14); color: rgb(var(--ok)); }
-.o2-tag.amber, .o2-tag.inv-pending, .o2-tag.camp-paused, .o2-tag.cs-busy, .o2-tag.cs-no_answer { background: rgb(var(--amber) / .15); color: rgb(var(--amber)); }
+.o2-tag.amber, .o2-tag.inv-pending, .o2-tag.camp-paused, .o2-tag.cs-busy, .o2-tag.cs-no_answer, .o2-tag.cs-operator_busy { background: rgb(var(--amber) / .15); color: rgb(var(--amber)); }
 .o2-tag.hot, .o2-tag.st-error, .o2-tag.inv-failed, .o2-tag.cs-failed, .o2-tag.cs-declined { background: rgb(var(--hot) / .13); color: rgb(var(--hot)); }
 .o2-tag.mute, .o2-tag.cs-queued, .o2-tag.cs-blocked, .o2-tag.camp-draft { background: rgb(var(--ink) / .06); color: rgb(var(--mute)); }
 .o2-tag.demo { background: rgb(var(--amber) / .16); color: rgb(var(--amber)); letter-spacing: .04em; }

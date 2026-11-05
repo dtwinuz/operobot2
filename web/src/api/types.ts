@@ -58,7 +58,7 @@ export type Campaign = {
   total: number; called: number; answered: number; connected: number; createdAt: string; skipped?: number
 }
 
-export type CallStatus = 'queued' | 'dialing' | 'answered' | 'connected' | 'no_answer' | 'busy' | 'failed' | 'declined' | 'blocked'
+export type CallStatus = 'queued' | 'dialing' | 'answered' | 'connected' | 'no_answer' | 'busy' | 'failed' | 'declined' | 'blocked' | 'operator_busy'
 export type Call = {
   id: string; campaignId: string | null; direction: 'out' | 'in'; status: CallStatus; durationSec: number
   startedAt: string | null; summary: string | null; contact: { id: string; name: string; phone: string | null }

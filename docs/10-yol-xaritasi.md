@@ -13,7 +13,7 @@ API (auth, ko'p mijoz + RLS, inbox, doska, kontaktlar, kanallar, AI agent, kampa
 | 3 | WhatsApp Cloud API, Instagram Messaging | Meta Business akkaunt va app review |
 | 4 | SMS shlyuz adapteri (Eskiz yoki Play Mobile) | Shartnoma va token |
 | 5 | LLM ulash, o'zbekcha javob sifatini baholash | API kalit, huquqshunos (ma'lumot chet elga chiqadi) |
-| 6 | operobot dialer'ga kampaniya API: `POST /originate`, natija webhook | operobot repoda PR |
+| 6 | ✅ Dialer kampaniya API: `POST /originate`, natija webhook (operobot #35). Haqiqiy qo'ng'iroqda sinash: SIP trunk | SIP trunk |
 | 7 | Ovozli AI agent ko'prigi (operobot #33 agent.ts) | 6 |
 | 8 | Payme sandbox testi, Click `Prepare/Complete` | Merchant akkauntlar |
 | 9 | ✅ Kanal tokenlarini shifrlash ([07](07-xavfsizlik.md)) | — |
