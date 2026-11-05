@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Search, Users, X } from 'lucide-react'
-import { get } from '../api/client'
+import { get, patch } from '../api/client'
 import type { Contact, ContactDetail } from '../api/types'
 import { t } from '../i18n'
 import { ago, Avatar, ChBadge, dur, Empty, ErrorBox, errText, money, Skeleton, useLoad, when } from '../lib'
@@ -46,6 +46,13 @@ export function ContactsPage() {
 function Drawer({ id, onClose }: { id: string; onClose: () => void }) {
   const [d, setD] = useState<ContactDetail | null>(null)
   const [err, setErr] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  async function toggleDnc() {
+    if (!d) return
+    setSaving(true)
+    try { const r = await patch<{ doNotCallAt: string | null }>(`/contacts/${id}`, { doNotCall: !d.doNotCallAt }); setD({ ...d, doNotCallAt: r.doNotCallAt }); setErr(null) }
+    catch (e) { setErr(errText(e)) } finally { setSaving(false) }
+  }
   useEffect(() => {
     let dead = false
     setD(null)
@@ -59,14 +66,17 @@ function Drawer({ id, onClose }: { id: string; onClose: () => void }) {
       <div className="o2-scrim" onClick={onClose} />
       <aside className="o2-drawer" role="dialog" aria-modal="true">
         <button className="o2-icon-btn o2-drawer-x" onClick={onClose} aria-label={t.common.close}><X size={18} /></button>
-        {err ? <ErrorBox text={err} /> : !d ? <Skeleton rows={8} /> : (
+        {err && !d ? <ErrorBox text={err} /> : !d ? <Skeleton rows={8} /> : (
           <>
             <div className="o2-drawer-h"><Avatar name={d.name} size={48} /><div><h2>{d.name}</h2><small className="o2-mono">{d.phone ?? '—'}{d.username ? ` · @${d.username}` : ''}</small></div></div>
             <div className="o2-kv">
               <span>{C.channel}</span><b><ChBadge kind={d.channel} /> {t.channels[d.channel]}</b>
               <span>{C.created}</span><b>{when(d.createdAt)}</b>
               <span>{C.lastSeen}</span><b>{ago(d.lastSeenAt)}</b>
+              {d.phone && <><span>{C.doNotCall}</span><b>{d.doNotCallAt ? C.doNotCallOn : C.doNotCallOff}</b></>}
             </div>
+            {err && <ErrorBox text={err} />}
+            {d.phone && <button className="o2-btn sm ghost" disabled={saving} onClick={() => void toggleDnc()}>{d.doNotCallAt ? C.unblock : C.block}</button>}
             <h3>{C.leads}</h3>
             {d.leads.length ? <ul className="o2-list">{d.leads.map(l => <li key={l.id}><b>{l.title}</b><span>{money(l.value)}</span></li>)}</ul> : <p className="o2-muted">{t.common.empty}</p>}
             <h3>{C.conversations}</h3>

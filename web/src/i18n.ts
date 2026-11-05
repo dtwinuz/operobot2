@@ -13,7 +13,7 @@ const uz = {
   interest: { yuqori: 'Yuqori', "o'rta": "O'rta", past: 'Past' } as Record<string, string>,
   callStatus: {
     queued: 'Navbatda', dialing: 'Terilmoqda', answered: "Ko'tardi", connected: 'Operatorga ulandi', no_answer: "Javob yo'q",
-    busy: 'Band', failed: 'Xato', declined: 'Rad etdi',
+    busy: 'Band', failed: 'Xato', declined: 'Rad etdi', blocked: "Qora ro'yxat",
   } as Record<string, string>,
   campaignStatus: { draft: 'Qoralama', running: 'Ishlamoqda', paused: "To'xtatilgan", done: 'Tugadi' } as Record<string, string>,
   landing: {
@@ -86,13 +86,15 @@ const uz = {
   board: {
     newLead: '+ Lid', title: 'Sarlavha', value: "Qiymat (so'm)", noCards: "Bo'sh", moveTo: "Bosqichga o'tkazish", next: 'Keyingi qadam', due: 'Eslatma',
   },
-  contacts: { title: 'Kontaktlar', channel: 'Kanal', lastSeen: 'Oxirgi faollik', leads: 'Lidlar', tags: 'Teglar', conversations: 'Suhbatlar', calls: "Qo'ng'iroqlar", created: 'Qo‘shilgan' },
+  contacts: { title: 'Kontaktlar', channel: 'Kanal', lastSeen: 'Oxirgi faollik', leads: 'Lidlar', tags: 'Teglar', conversations: 'Suhbatlar', calls: "Qo'ng'iroqlar", created: 'Qo‘shilgan', doNotCall: "Qora ro'yxat", doNotCallOn: "Qo'ng'iroq qilinmaydi", doNotCallOff: "Qo'ng'iroq mumkin", block: "Qora ro'yxatga qo'shish", unblock: "Qora ro'yxatdan chiqarish" },
   calls: {
     title: 'Kampaniyalar', create: 'Yangi kampaniya', name: 'Kampaniya nomi', agent: 'Ovozli agent', noAgent: "Agentsiz (yozilgan audio + 1/2)",
     phones: 'Telefonlar (har qatorda bitta)', start: 'Boshlash', pause: "To'xtatish", total: 'Jami', called: 'Qilindi', answered: "Ko'tardi", connected: 'Ulandi',
     log: "Qo'ng'iroqlar jurnali", duration: 'Davomiylik', summary: 'Xulosa', direction: "Yo'nalish", out: 'Chiquvchi', in: 'Kiruvchi',
-    lock: "Qonuniy oyna: reklama qo'ng'iroqlari faqat 09:00–18:00 (Toshkent). Bu vaqtdan tashqari navbat avtomatik kutadi.",
+    lock: "Qonuniy oyna: reklama qo'ng'iroqlari faqat 09:00–18:00 (Toshkent), yakshanba va bayramda yo'q. Bu vaqtdan tashqari navbat avtomatik kutadi.",
     count: 'ta raqam',
+    consent: "Ro'yxatdagi har bir mijoz qo'ng'iroq olishga rozilik bergan, buning uchun javobgarlikni tashkilot oladi",
+    skipped: "ta raqam qora ro'yxatda, kampaniyaga qo'shilmadi",
   },
   agents: {
     title: 'AI agentlar', create: 'Yangi agent', kind: 'Turi', chat: 'Yozma', voice: 'Ovozli', enabled: 'Yoqilgan', greeting: 'Salomlashish',

@@ -22,10 +22,12 @@
 ## Qo'ng'iroqlar
 
 - Kampaniya = telefon ro'yxati (`+998 XX XXX XX XX` ko'rinishiga keltiriladi, takrorlar olib tashlanadi) + ixtiyoriy ovozli agent.
-- Runner har 3 soniyada har ishlayotgan kampaniyadan bitta qo'ng'iroq boshlaydi (v0.1: kampaniyaga 1 liniya).
+- Runner har 3 soniyada tekshiradi. Kampaniyada 1 liniya (v0.1): keyingi qo'ng'iroq oldingisining natijasi kelgach boshlanadi. 30 daqiqada natija kelmasa, qo'ng'iroq `failed` bilan yopiladi.
+- **Rozilik**: haqiqiy kampaniya yaratishda ro'yxat rozilik berganini tasdiqlash shart (kim, qachon: `campaigns.consent_by`, `consent_at`); tasdiqsiz kampaniya terilmaydi.
+- **Qora ro'yxat**: «2» bosgan (`declined`) raqam o'zi tushadi, panelda (kontakt kartasi) qo'lda ham qo'shiladi. Raqam bo'yicha ishlaydi: kampaniyaga qo'shilmaydi, navbatda bo'lsa `blocked` bo'ladi.
 - **Demo tashkilot**: qo'ng'iroq simulyatsiya qilinadi (javob bermadi / band / 2 / 1 → operator), telefon tarmog'iga hech narsa chiqmaydi.
-- **Haqiqiy tashkilot**: `POST {DIALER_URL}/originate {callId, phone, callback}` → natija `POST /api/hooks/dialer/<orgId>.<hook_secret> {callId, status, durationSec, summary}`. ⚠️ operobot dialer'da bu endpoint hali yo'q: u yerda kampaniya API'si kerak ([10](10-yol-xaritasi.md)).
-- Qonuniy oyna: `max(9, work_from) ≤ soat < min(18, work_to)` Toshkent vaqti. Faqat demo tashkilot chetlab o'tadi.
+- **Haqiqiy tashkilot**: `POST {DIALER_URL}/originate {callId, phone, callback}` → natija `POST /api/hooks/dialer/<orgId>.<hook_secret> {callId, status, durationSec, summary}`. Javob 2xx: kutiladi. 400 yoki 422: raqam rad etildi, `failed`. Qolgani (javob yo'q, 5xx, 401, 404, 409, 429): raqam navbatga qaytadi, 15 soniyadan keyin qayta so'raladi, shuning uchun dialer `callId` bo'yicha takrorni tanishi kerak. Takror natija ikkinchi marta hisoblanmaydi. ⚠️ operobot dialer'da bu endpoint hali yo'q ([10](10-yol-xaritasi.md)).
+- Qonuniy oyna: `max(9, work_from) ≤ soat < min(18, work_to)` Toshkent vaqti, yakshanba va bayramda yo'q (operobot dialer bilan bir xil; hayitlar `.env` `HOLIDAYS` da, har yili yangilanadi). Faqat demo tashkilot chetlab o'tadi.
 
 ## MCP
 

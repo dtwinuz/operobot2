@@ -22,6 +22,8 @@ const schema = z.object({
   // operobot dialer bridge (docs/05). Without it calls are simulated for demo orgs only.
   DIALER_URL: z.string().default(""),
   DIALER_TOKEN: z.string().default(""),
+  // Decreed extra days off (Ramazon and Qurbon hayiti), comma separated YYYY-MM-DD. Fixed holidays are in voice/calls.ts.
+  HOLIDAYS: z.string().regex(/^(\d{4}-\d{2}-\d{2})?(,\s*\d{4}-\d{2}-\d{2})*$/, "YYYY-MM-DD, vergul bilan").default(""),
   // Encrypts channel credentials at rest (docs/07). Without it channels with credentials cannot be added.
   CHANNEL_KEY: z.string().regex(/^([0-9a-fA-F]{64})?$/, "64 ta hex belgi kerak: openssl rand -hex 32").default(""),
 });

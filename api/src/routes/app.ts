@@ -99,18 +99,29 @@ export function appRoutes(app: FastifyInstance, cfg: Config): void {
     // ---- contacts
     r.get("/api/contacts", async (req) => {
       const { q: s } = z.object({ q: z.string().optional() }).parse(req.query);
-      return req.db((q) => q.many(`select c.id, c.name, c.phone, c.username, c.channel, c.tags, c.created_at "createdAt", c.last_seen_at "lastSeenAt",
+      return req.db((q) => q.many(`select c.id, c.name, c.phone, c.username, c.channel, c.tags, c.created_at "createdAt", c.last_seen_at "lastSeenAt", c.do_not_call_at "doNotCallAt",
         (select count(*)::int from leads l where l.contact_id = c.id) leads from contacts c
         where ($1::text is null or c.name ilike $1 or c.phone ilike $1 or c.username ilike $1) order by coalesce(c.last_seen_at, c.created_at) desc limit 500`, [s ? `%${s}%` : null]));
     });
     r.get("/api/contacts/:id", async (req) => {
       const { id: cid } = id.parse(req.params);
       return req.db(async (q) => {
-        const c = await q.one(`select c.id, c.name, c.phone, c.username, c.channel, c.tags, c.created_at "createdAt", c.last_seen_at "lastSeenAt",
+        const c = await q.one(`select c.id, c.name, c.phone, c.username, c.channel, c.tags, c.created_at "createdAt", c.last_seen_at "lastSeenAt", c.do_not_call_at "doNotCallAt",
           (select count(*)::int from leads l where l.contact_id = c.id) leads from contacts c where c.id = $1`, [cid]);
         return { ...c, conversations: await q.many(`${CONV_SELECT} where v.contact_id = $1 order by v.last_at desc nulls last`, [cid]),
           calls: await q.many(`${CALL_SELECT} where k.contact_id = $1 order by k.created_at desc`, [cid]),
           leads: await q.many(`${LEAD_SELECT} where l.contact_id = $1 order by l.updated_at desc`, [cid]) };
+      });
+    });
+    r.patch("/api/contacts/:id", { preHandler: admin }, async (req) => {
+      const { id: cid } = id.parse(req.params);
+      const { doNotCall } = z.object({ doNotCall: z.boolean() }).parse(req.body);
+      return req.db(async (q) => {
+        // Every contact with this number: the same person can arrive from several channels.
+        const c = await q.one<{ phone: string | null }>("select phone from contacts where id = $1", [cid]);
+        await q.exec(`update contacts set do_not_call_at = case when $3 then coalesce(do_not_call_at, now()) end, do_not_call_reason = case when $3 then coalesce(do_not_call_reason, 'qo''lda') end
+          where id = $1 or (phone is not null and phone = $2)`, [cid, c.phone, doNotCall]);
+        return q.one(`select id, do_not_call_at "doNotCallAt" from contacts where id = $1`, [cid]);
       });
     });
 
@@ -206,16 +217,21 @@ export function appRoutes(app: FastifyInstance, cfg: Config): void {
     // ---- calls
     r.get("/api/campaigns", async (req) => req.db((q) => q.many(`${CAMPAIGN_SELECT} group by p.id order by p.created_at desc`)));
     r.post("/api/campaigns", { preHandler: admin }, async (req) => {
-      const b = z.object({ name: z.string().trim().min(1).max(120), agentId: z.string().uuid().nullable().optional(), phones: z.array(z.string().max(40)).min(1).max(5000) }).parse(req.body);
+      const b = z.object({ name: z.string().trim().min(1).max(120), agentId: z.string().uuid().nullable().optional(), phones: z.array(z.string().max(40)).min(1).max(5000), consent: z.boolean().optional() }).parse(req.body);
+      if (!req.ctx.demo && !b.consent) throw err(400, "Ro'yxatdagilar rozilik berganini tasdiqlang");
       const phones = [...new Set(b.phones.map((p) => findPhone(p)).filter((p): p is string => !!p))];
       if (!phones.length) throw err(400, "Telefon raqamlar topilmadi (+998 XX XXX XX XX)");
       return req.db(async (q) => {
-        const p = await q.one<{ id: string }>("insert into campaigns(org_id, name, agent_id) values ($1,$2,$3) returning id", [req.ctx.orgId, b.name, b.agentId ?? null]);
-        for (const ph of phones) {
+        const barred = new Set((await q.many<{ phone: string }>("select phone from contacts where do_not_call_at is not null and phone = any($1)", [phones])).map((c) => c.phone));
+        const allowed = phones.filter((ph) => !barred.has(ph));
+        if (!allowed.length) throw err(400, "Barcha raqamlar qora ro'yxatda");
+        const p = await q.one<{ id: string }>("insert into campaigns(org_id, name, agent_id, consent_at, consent_by) values ($1,$2,$3,$4,$5) returning id",
+          [req.ctx.orgId, b.name, b.agentId ?? null, b.consent ? new Date() : null, b.consent ? req.ctx.userId : null]);
+        for (const ph of allowed) {
           const c = (await q.maybe<{ id: string }>("select id from contacts where phone = $1 limit 1", [ph])) ?? await q.one<{ id: string }>("insert into contacts(org_id, name, phone) values ($1,$2,$2) returning id", [req.ctx.orgId, ph]);
           await q.exec("insert into calls(org_id, campaign_id, contact_id) values ($1,$2,$3)", [req.ctx.orgId, p.id, c.id]);
         }
-        return getCampaign(q, p.id);
+        return { ...(await getCampaign(q, p.id)), skipped: barred.size };
       });
     });
     for (const [act, status] of [["start", "running"], ["pause", "paused"]] as const) {
@@ -224,6 +240,8 @@ export function appRoutes(app: FastifyInstance, cfg: Config): void {
         if (act === "start" && !req.ctx.demo) {
           if (!cfg.DIALER_URL) throw err(409, "Dialer ulanmagan (DIALER_URL). Qo'ng'iroq faqat demo rejimida simulyatsiya qilinadi");
           if ((plan(req.ctx.plan).limits.callMinutes) === 0) throw limitError("qo'ng'iroq daqiqalari");
+          const ok = await req.db((q) => q.maybe("select 1 from campaigns where id = $1 and consent_at is not null", [pid]));
+          if (!ok) throw err(409, "Bu kampaniyada rozilik tasdiqlanmagan: yangi kampaniya yarating");
         }
         const c = await req.db(async (q) => { await q.one("update campaigns set status = $2 where id = $1 and status <> 'done' returning id", [pid, status]); return getCampaign(q, pid); });
         emit(req.ctx.orgId, "campaign", c);
