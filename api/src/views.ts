@@ -28,7 +28,7 @@ export const CAMPAIGN_SELECT = `
   select p.id, p.name, p.status, p.agent_id "agentId", p.created_at "createdAt",
     count(k.id)::int total,
     count(k.id) filter (where k.status <> 'queued' and k.status <> 'dialing')::int called,
-    count(k.id) filter (where k.status in ('answered', 'connected', 'declined'))::int answered,
+    count(k.id) filter (where k.status in ('answered', 'connected', 'operator_busy', 'declined'))::int answered,
     count(k.id) filter (where k.status = 'connected')::int connected
   from campaigns p left join calls k on k.campaign_id = p.id`;
 

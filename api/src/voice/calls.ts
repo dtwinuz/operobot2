@@ -64,12 +64,14 @@ export async function finish(orgId: string, callId: string, status: string, dura
     if (!c) return;
     if (durationSec) await bump(q, orgId, "call_seconds", durationSec);
     if (status === "declined") await q.exec("update contacts set do_not_call_at = coalesce(do_not_call_at, now()), do_not_call_reason = coalesce(do_not_call_reason, '2_bosdi') where id = $1", [c.contact_id]);
-    if (status === "connected" || status === "declined") {
+    if (status === "connected" || status === "declined" || status === "operator_busy") {
       const lead = (await q.maybe<{ id: string }>("select id from leads where contact_id = $1 order by created_at desc limit 1", [c.contact_id]))
         ?? await q.one<{ id: string }>("insert into leads(org_id, contact_id, stage_id, title, source) select $1, $2, id, $3, 'call' from stages where org_id = $1 and key = 'yangi' returning id", [orgId, c.contact_id, `${c.name} · qo'ng'iroq`]);
       const meeting = summary?.includes("ertaga soat 11") ? new Date(Date.now() + 86400_000).toISOString().slice(0, 11) + "06:00:00.000Z" : undefined;
       await applyExtracted(q, orgId, lead.id, status === "declined"
         ? { interest: "past", stage: "yutqazildi", summary: summary ?? undefined }
+        : status === "operator_busy" // pressed 1 but no operator was free: the hottest lead, must not get lost
+        ? { interest: "yuqori", stage: "qayta", summary: summary ?? undefined }
         : { interest: meeting ? "yuqori" : "o'rta", stage: meeting ? "uchrashuv" : "qiziqdi", summary: summary ?? undefined, meeting }, "qo'ng'iroq");
     }
     await pushCall(q, orgId, callId, c.campaign_id);

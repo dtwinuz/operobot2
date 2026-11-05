@@ -27,7 +27,7 @@ export function publicRoutes(app: FastifyInstance, cfg: Config, version: string)
     if (kind === "dialer") {
       const orgId = await orgByDialerSecret(secret);
       if (!orgId) return reply.code(404).send({ error: "topilmadi" });
-      const b = z.object({ callId: z.string().uuid(), status: z.enum(["answered", "connected", "no_answer", "busy", "failed", "declined"]), durationSec: z.number().int().min(0).default(0), summary: z.string().max(1000).nullable().optional() }).parse(req.body);
+      const b = z.object({ callId: z.string().uuid(), status: z.enum(["answered", "connected", "operator_busy", "no_answer", "busy", "failed", "declined"]), durationSec: z.number().int().min(0).default(0), summary: z.string().max(1000).nullable().optional() }).parse(req.body);
       const ok = await tx(orgId, (q) => q.maybe("select 1 from calls where id = $1", [b.callId]));
       if (!ok) return reply.code(404).send({ error: "qo'ng'iroq topilmadi" });
       await finish(orgId, b.callId, b.status, b.durationSec, b.summary ?? null);

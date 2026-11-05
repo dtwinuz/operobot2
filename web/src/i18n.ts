@@ -13,7 +13,7 @@ const uz = {
   interest: { yuqori: 'Yuqori', "o'rta": "O'rta", past: 'Past' } as Record<string, string>,
   callStatus: {
     queued: 'Navbatda', dialing: 'Terilmoqda', answered: "Ko'tardi", connected: 'Operatorga ulandi', no_answer: "Javob yo'q",
-    busy: 'Band', failed: 'Xato', declined: 'Rad etdi', blocked: "Qora ro'yxat",
+    busy: 'Band', failed: 'Xato', declined: 'Rad etdi', blocked: "Qora ro'yxat", operator_busy: 'Operator band edi',
   } as Record<string, string>,
   campaignStatus: { draft: 'Qoralama', running: 'Ishlamoqda', paused: "To'xtatilgan", done: 'Tugadi' } as Record<string, string>,
   landing: {
