@@ -7,6 +7,7 @@ import { hashPassword, requireAuth, requireRole, sha, token } from "../auth.js";
 import { subscribe } from "../bus.js";
 import { emit } from "../bus.js";
 import { connect, hookUrl, type Kind } from "../channels/adapters.js";
+import { canSeal, hasCredentials, seal } from "../channels/secrets.js";
 import { decide } from "../ai/brain.js";
 import { sendOut, suggest } from "../flow.js";
 import { PLANS, plan, price } from "../billing/plans.js";
@@ -158,10 +159,11 @@ export function appRoutes(app: FastifyInstance, cfg: Config): void {
       const b = z.object({ kind: z.enum(["telegram", "whatsapp", "instagram", "sms", "widget"]), name: z.string().trim().min(1).max(80), config: z.record(z.string(), z.string().max(500)).default({}) }).parse(req.body);
       if (!(await req.db((q) => fits(q, req.ctx.orgId, "channels")))) throw limitError("kanallar soni");
       if (!req.ctx.demo && b.kind !== "widget" && !Object.values(b.config).some((v) => v.trim())) throw err(400, "Kanal ma'lumotlari kerak (token va h.k.)");
+      if (hasCredentials(b.config) && !canSeal()) throw err(409, "Kanal ulash hozircha o'chiq: serverda CHANNEL_KEY sozlanmagan");
       const secret = token(18);
       const st = await connect(cfg, b.kind, b.config, secret);
       const row = await req.db((q) => q.one("insert into channels(org_id, kind, name, status, config, secret, widget_key, info) values ($1,$2,$3,$4,$5,$6,$7,$8) returning *",
-        [req.ctx.orgId, b.kind, b.name, st.status, b.config, secret, b.kind === "widget" ? token(12) : null, st.info]));
+        [req.ctx.orgId, b.kind, b.name, st.status, seal(req.ctx.orgId, b.config), secret, b.kind === "widget" ? token(12) : null, st.info]));
       return chanOut(row);
     });
     r.delete("/api/channels/:id", { preHandler: admin }, async (req) => {

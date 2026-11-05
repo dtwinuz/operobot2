@@ -17,7 +17,7 @@ Migratsiyalar API ishga tushganda o'zi qo'llanadi. `http://localhost:4392/` → 
 | `operobot2-api` | `api/Dockerfile` (Node 24), `.env` dan sozlama, faqat ichki tarmoqda |
 | `operobot2-web` | Caddy: `web/dist` + `/api/*` → api (SSE uchun `flush_interval -1`) |
 
-1. Serverda `<dir>/.env` ni [`.env.example`](../.env.example) dan yarating (`DB_PASSWORD` majburiy).
+1. Serverda `<dir>/.env` ni [`.env.example`](../.env.example) dan yarating (`DB_PASSWORD` majburiy). Haqiqiy kanal ulash uchun `CHANNEL_KEY` ham kerak: `openssl rand -hex 32`. Nusxasini baza zaxirasidan alohida saqlang: kalit yo'qolsa, saqlangan kanal tokenlarini qayta kiritish kerak bo'ladi.
 2. `bash deploy/deploy.sh <ssh-host> <dir>` — web build, fayllarni yuboradi, `docker compose up -d --build`.
 3. Tashqi TLS: edge Caddy `<domen> → operobot2-web:80` (dtwin VPS'da `dtwinuz/dtwin` edge PR orqali; `EDGE_NETWORK` default `dtwin-prod_default`). `operobot2-web` portini tashqariga ochmang: API mijoz IP'sini edge qo'ygan `X-Forwarded-For` dan oladi.
 

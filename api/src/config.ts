@@ -22,6 +22,8 @@ const schema = z.object({
   // operobot dialer bridge (docs/05). Without it calls are simulated for demo orgs only.
   DIALER_URL: z.string().default(""),
   DIALER_TOKEN: z.string().default(""),
+  // Encrypts channel credentials at rest (docs/07). Without it channels with credentials cannot be added.
+  CHANNEL_KEY: z.string().regex(/^([0-9a-fA-F]{64})?$/, "64 ta hex belgi kerak: openssl rand -hex 32").default(""),
 });
 
 export type Config = z.infer<typeof schema>;
