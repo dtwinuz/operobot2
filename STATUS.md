@@ -14,6 +14,6 @@
 | Qo'ng'iroqlar | ✅ demo simulyatsiya; 🟡 operobot dialer ko'prigi (dialer tomoni yo'q) |
 | Tarif, limit, Payme | ✅ demo; 🟡 Payme lokal JSON-RPC bilan sinalgan, sandbox'da emas |
 | MCP | ✅ lokal |
-| Deploy | ⏳ DNS kutilmoqda ([06](docs/06-deploy.md)) |
+| Deploy | ✅ demo https://operobot2.dtwin.uz, brauzerda 10 sahifa va vidjet sinaldi ([06](docs/06-deploy.md)); ⏳ prod server tanlanmagan |
 
 Keyingi ishlar: [docs/10](docs/10-yol-xaritasi.md).

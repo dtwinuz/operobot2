@@ -8,7 +8,7 @@ API (auth, ko'p mijoz + RLS, inbox, doska, kontaktlar, kanallar, AI agent, kampa
 
 | # | Ish | Nimaga bog'liq |
 |---|---|---|
-| 1 | Demo'ni `operobot2.dtwin.uz` ga chiqarish | DNS A yozuvi (egasi) + dtwin edge PR |
+| 1 | ✅ Demo https://operobot2.dtwin.uz da ishlaydi | — |
 | 2 | Telegram botni haqiqiy ulab sinash | Bot token (egasi) |
 | 3 | WhatsApp Cloud API, Instagram Messaging | Meta Business akkaunt va app review |
 | 4 | SMS shlyuz adapteri (Eskiz yoki Play Mobile) | Shartnoma va token |
