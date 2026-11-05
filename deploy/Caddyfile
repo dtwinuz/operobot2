@@ -1,6 +1,10 @@
 {
 	admin off
 	auto_https off
+	# keep the client IP set by the edge Caddy: API rate limits are per client, not per proxy
+	servers {
+		trusted_proxies static private_ranges
+	}
 }
 
 # TLS is terminated by the edge Caddy. This container serves web/dist and proxies /api/* to the API.
