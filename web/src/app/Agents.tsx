@@ -7,7 +7,7 @@ import { ChBadge, Empty, ErrorBox, errText, Skeleton, useLoad, useToast } from '
 
 const A = t.agents
 type Draft = Omit<Agent, 'id' | 'stats'>
-const blank: Draft = { name: 'Yangi agent', kind: 'chat', enabled: false, prompt: '', greeting: 'Assalomu alaykum! Qanday yordam bera olaman?', handoff: ['operator'], channelIds: [], voice: null }
+const blank: Draft = { name: t.agents.blank, kind: 'chat', enabled: false, prompt: '', greeting: 'Assalomu alaykum! Qanday yordam bera olaman?', handoff: ['operator'], channelIds: [], voice: null }
 
 export function AgentsPage() {
   const toast = useToast()

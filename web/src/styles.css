@@ -44,6 +44,8 @@ code, pre, .o2-mono { font-family: var(--mono); }
 .o2-btn.pay { flex: 1; color: #fff; }
 .o2-btn.pay.payme { background: #00a6a6; }
 .o2-btn.pay.click { background: #0f62fe; }
+.o2-lang { height: 34px; max-width: 112px; padding: 0 6px; border: 1px solid rgb(var(--ink) / .14); border-radius: 8px; background: transparent; color: inherit; font: inherit; font-size: 13px; }
+.o2-lang option { color: #111; background: #fff; }
 .o2-icon-btn { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--line); background: rgb(var(--panel)); color: rgb(var(--ink2)); flex: none; }
 .o2-icon-btn.sm { width: 26px; height: 26px; border-radius: 7px; }
 .o2-icon-btn:hover { color: rgb(var(--ink)); border-color: var(--line2); }
