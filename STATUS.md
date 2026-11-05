@@ -3,6 +3,7 @@
 | Sana | Nima | PR |
 |---|---|---|
 | 2026-11-04 | Repo ochildi. v0.1: API (Fastify + PostgreSQL RLS), panel + landing (React), demo sandbox, Payme Merchant API, MCP 6 tool, Docker deploy, docs 00–10 + ADR 0001–0003 | #1 |
+| 2026-11-05 | Kanal tokenlari bazada shifrlangan (`CHANNEL_KEY`) | #20 |
 
 ## Hozirgi holat
 

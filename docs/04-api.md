@@ -72,7 +72,7 @@ type Message = { id: string; direction: 'in' | 'out'; author: 'contact' | 'ai' |
 type Channel = { id: string; kind: 'telegram' | 'whatsapp' | 'instagram' | 'sms' | 'widget'; name: string; status: 'connected' | 'demo' | 'error'; info: string | null; webhookUrl: string | null; widgetKey: string | null; createdAt: string }
 ```
 `GET /api/channels` · `POST /api/channels {kind, name, config}` · `DELETE /api/channels/:id`.
-`config`: telegram `{token}` · whatsapp `{phoneNumberId, token, verifyToken}` · instagram `{pageId, token}` · sms `{url, token, from}` · widget `{}`. Demo tashkilotda `config` bo'sh bo'lsa kanal `demo` holatda bo'ladi.
+`config`: telegram `{token}` · whatsapp `{phoneNumberId, token, verifyToken}` · instagram `{pageId, token}` · sms `{url, token, from}` · widget `{}`. Demo tashkilotda `config` bo'sh bo'lsa kanal `demo` holatda bo'ladi. `config` hech qachon javobda qaytmaydi. Serverda `CHANNEL_KEY` bo'lmasa, kalitli kanal `409` bilan rad etiladi.
 
 ## AI agentlar
 

@@ -8,7 +8,7 @@
 | API kalit | `ob2_<prefix>_<secret>`, faqat sha256 saqlanadi, bir marta ko'rsatiladi |
 | Webhook | URL ichida tasodifiy `secret`; Payme — Basic auth `Paycom:<PAYME_KEY>` (`timingSafeEqual`) |
 | Rate limit | umumiy 600/daq, login 20/15 daq, signup va demo 10/soat, vidjet 30/daq (IP bo'yicha) |
-| Kanal tokenlari | `channels.config` (jsonb) da. ⏳ keyingi qadam: `pgcrypto` bilan shifrlash |
+| Kanal tokenlari | `channels.config` da AES-256-GCM bilan shifrlangan, kalit `.env` dagi `CHANNEL_KEY`. Shifrlash API ichida: `pgcrypto`da kalit SQL parametri bo'lib bazaga yuborilardi. `org_id` shifrga bog'langan, boshqa tashkilot qatoriga ko'chirilgan blok ochilmaydi. Baza nusxasi o'g'irlansa tokenlar ochilmaydi, lekin server to'liq buzilsa kalit ham ochiq. Kalitni almashtirish hali yo'q |
 | Demo | Soxta ism va `+998 00` raqamlar; sandbox 24 soatdan keyin o'chadi; tashqi tarmoqqa hech narsa chiqmaydi |
 
 ## Qonun (O'zbekiston)

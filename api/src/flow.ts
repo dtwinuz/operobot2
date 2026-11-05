@@ -3,6 +3,7 @@ import type { Config } from "./config.js";
 import { SYSTEM, tx, type Q } from "./db.js";
 import { emit } from "./bus.js";
 import { send, type ChannelRow, type Inbound } from "./channels/adapters.js";
+import { openChannel } from "./channels/secrets.js";
 import { decide, type Decision, type Turn } from "./ai/brain.js";
 import { bump, fits, pushUsage } from "./billing/usage.js";
 import { getConv, getLead, MSG_SELECT } from "./views.js";
@@ -67,7 +68,7 @@ export async function sendOut(orgId: string, convId: string, text: string, autho
     const row = await q.one<{ ch: ChannelRow; external_id: string | null; phone: string | null }>(
       `select row_to_json(ch.*) ch, c.external_id, c.phone from conversations v join channels ch on ch.id = v.channel_id
        join contacts c on c.id = v.contact_id where v.id = $1`, [convId]);
-    const r = author === "system" ? { status: "sent" as const } : await send(row.ch, { externalId: row.external_id, phone: row.phone }, text);
+    const r = author === "system" ? { status: "sent" as const } : await send(openChannel(row.ch), { externalId: row.external_id, phone: row.phone }, text);
     const msg = await addMessage(q, orgId, convId, { direction: "out", author, text, status: r.status, userId });
     if (author === "user") await q.exec("update conversations set mode = 'human', unread = 0, assignee_id = coalesce(assignee_id, $2) where id = $1", [convId, userId]);
     if (author !== "system") await bump(q, orgId, "messages");
@@ -142,7 +143,11 @@ export async function suggest(orgId: string, convId: string): Promise<string> {
   return (await decide(cfg, { ...agent, handoff: ["\u0000"] }, agent.org_name, hist)).reply;
 }
 
-export const channelBySecret = (kind: string, secret: string) =>
-  tx(SYSTEM, (q) => q.maybe<ChannelRow>("select * from channels where kind = $1 and secret = $2", [kind, secret]));
-export const channelByWidget = (key: string) =>
-  tx(SYSTEM, (q) => q.maybe<ChannelRow>("select * from channels where kind = 'widget' and widget_key = $1", [key]));
+export const channelBySecret = async (kind: string, secret: string) => {
+  const ch = await tx(SYSTEM, (q) => q.maybe<ChannelRow>("select * from channels where kind = $1 and secret = $2", [kind, secret]));
+  return ch && openChannel(ch);
+};
+export const channelByWidget = async (key: string) => {
+  const ch = await tx(SYSTEM, (q) => q.maybe<ChannelRow>("select * from channels where kind = 'widget' and widget_key = $1", [key]));
+  return ch && openChannel(ch);
+};

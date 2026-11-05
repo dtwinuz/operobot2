@@ -6,6 +6,7 @@ import { ZodError } from "zod";
 import { loadConfig } from "./config.js";
 import { initDb, migrate } from "./db.js";
 import { initFlow } from "./flow.js";
+import { canSeal, initSecrets } from "./channels/secrets.js";
 import { authRoutes } from "./routes/auth.js";
 import { appRoutes } from "./routes/app.js";
 import { publicRoutes } from "./routes/public.js";
@@ -17,6 +18,7 @@ const VERSION = process.env.REVISION ?? "dev";
 
 await migrate(cfg.DATABASE_URL);
 initDb(cfg.DATABASE_URL);
+await initSecrets(cfg.CHANNEL_KEY);
 initFlow(cfg);
 
 const app = Fastify({ logger: { level: "warn" }, trustProxy: true, bodyLimit: 2 * 1024 * 1024 });
@@ -38,4 +40,4 @@ startCampaignRunner();
 if (cfg.DEMO) startDemoSimulator();
 
 await app.listen({ host: cfg.HOST, port: cfg.PORT });
-console.log(`operobot2 api ${VERSION} :${cfg.PORT} demo=${cfg.DEMO} llm=${cfg.LLM_URL ? "on" : "qoida"} dialer=${cfg.DIALER_URL ? "on" : "sim"} payme=${cfg.PAYME_MERCHANT_ID ? "on" : "off"}`);
+console.log(`operobot2 api ${VERSION} :${cfg.PORT} demo=${cfg.DEMO} llm=${cfg.LLM_URL ? "on" : "qoida"} dialer=${cfg.DIALER_URL ? "on" : "sim"} payme=${cfg.PAYME_MERCHANT_ID ? "on" : "off"} kanal_shifr=${canSeal() ? "on" : "off"}`);
