@@ -3,7 +3,7 @@ import { Bot, Building2, CreditCard, Inbox, KanbanSquare, LayoutDashboard, LogOu
 import { get, post, useEvents } from '../api/client'
 import type { Me, ServerEvent } from '../api/types'
 import { t } from '../i18n'
-import { errText, go, Skeleton, useTheme, useToast } from '../lib'
+import { errText, go, Skeleton, useTheme, useToast, LangSwitch } from '../lib'
 import { Ctx } from './ctx'
 import { Dashboard } from './Dashboard'
 import { InboxPage } from './Inbox'
@@ -105,6 +105,7 @@ export default function Shell({ path }: { path: string }) {
               {me.org.demo && <span className="o2-tag demo" title={t.shell.demoNote}>{t.shell.demo}<em className="hide-sm"> · {t.shell.demoNote}</em></span>}
             </div>
             <span className="o2-flex" />
+            <LangSwitch />
             <button className="o2-icon-btn" onClick={toggle} aria-label={t.common.theme}>{theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}</button>
             <button className="o2-icon-btn" onClick={() => void logout()} aria-label={t.common.logout} title={t.common.logout}><LogOut size={16} /></button>
           </header>

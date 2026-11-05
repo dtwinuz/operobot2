@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import { AtSign, Camera, Globe, MessageCircle, MessageSquareText, Phone, Send, UserPen } from 'lucide-react'
-import { t } from './i18n'
+import { lang, LANGS, setLang, t, type Lang } from './i18n'
 
 /* ---------- hash router ---------- */
 export function useHash(): string {
@@ -69,14 +69,23 @@ export function when(iso: string | null | undefined): string {
 export function ago(iso: string | null | undefined): string {
   if (!iso) return '—'
   const s = Math.max(0, (Date.now() - Date.parse(iso)) / 1000)
-  if (s < 60) return 'hozir'
-  if (s < 3600) return `${Math.floor(s / 60)} daq`
-  if (s < 86400) return `${Math.floor(s / 3600)} soat`
-  return `${Math.floor(s / 86400)} kun`
+  const A = t.common.ago
+  if (s < 60) return A.now
+  if (s < 3600) return `${Math.floor(s / 60)} ${A.min}`
+  if (s < 86400) return `${Math.floor(s / 3600)} ${A.hour}`
+  return `${Math.floor(s / 86400)} ${A.day}`
 }
 export const dur = (sec: number) => `${Math.floor(sec / 60)}:${pad(Math.floor(sec % 60))}`
 export const initials = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 2).map(s => s[0]!.toUpperCase()).join('') || '?'
 export const errText = (e: unknown) => (e instanceof Error ? e.message : String(e))
+
+export function LangSwitch() {
+  return (
+    <select className="o2-lang" aria-label={t.common.language} value={lang} onChange={e => setLang(e.target.value as Lang)}>
+      {LANGS.map(l => <option key={l.key} value={l.key}>{l.label}</option>)}
+    </select>
+  )
+}
 
 /* ---------- channel icon ---------- */
 export function ChIcon({ kind, size = 14 }: { kind: string; size?: number }) {

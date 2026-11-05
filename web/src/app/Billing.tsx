@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react'
 import { Check, CreditCard } from 'lucide-react'
 import { get, post } from '../api/client'
 import type { Billing, Invoice, Limits, Plan } from '../api/types'
-import { t } from '../i18n'
+import { lang, t } from '../i18n'
 import { ErrorBox, errText, money, num, Skeleton, useLoad, useToast, when } from '../lib'
 import { useApp } from './ctx'
 
 const B = t.billing
 const KEYS: (keyof Limits)[] = ['operators', 'channels', 'messages', 'aiReplies', 'callMinutes']
+
+// The API's plan names and feature lines are Uzbek; the limits above them are translated from their keys.
+const planName = (p: { key: string; name: string }) => t.landing.plans.find(x => x.key === p.key)?.name ?? p.name
 
 export function BillingPage() {
   const { on, reloadMe } = useApp()
@@ -36,7 +39,7 @@ export function BillingPage() {
       <div className="o2-bill-top">
         <section className="o2-card">
           <div className="o2-card-h"><CreditCard size={15} /><b>{B.current}</b></div>
-          <div className="o2-bill-plan"><strong>{b.plan.name}</strong><span>{b.plan.priceMonth == null ? t.landing.priceAsk : money(b.plan.priceMonth) + '/oy'}</span></div>
+          <div className="o2-bill-plan"><strong>{planName(b.plan)}</strong><span>{b.plan.priceMonth == null ? t.landing.priceAsk : money(b.plan.priceMonth) + '/oy'}</span></div>
           <small className="o2-muted">{B.period}: {when(b.periodStart)} — {when(b.periodEnd)}</small>
         </section>
         <section className="o2-card">
@@ -62,11 +65,11 @@ export function BillingPage() {
           const price = p.priceMonth == null ? null : Math.round(p.priceMonth * (yearly ? 0.8 : 1))
           return (
             <div key={p.key} className={`o2-plan${cur ? ' cur' : ''}`}>
-              <div className="o2-plan-h"><b>{p.name}</b>{cur ? <span className="o2-tag acc">{B.currentChip}</span> : price ? <span className="o2-tag mute">{t.common.demoChip}</span> : null}</div>
+              <div className="o2-plan-h"><b>{planName(p)}</b>{cur ? <span className="o2-tag acc">{B.currentChip}</span> : price ? <span className="o2-tag mute">{t.common.demoChip}</span> : null}</div>
               <div className="o2-plan-p">{price == null ? <strong>{t.landing.priceAsk}</strong> : <><strong>{num(price)}</strong><small>{t.common.perMonth}</small></>}</div>
               <ul>
                 {KEYS.map(k => <li key={k}><Check size={13} /> {B.limits[k]}: {p.limits[k] < 0 ? t.common.unlimited : num(p.limits[k])}</li>)}
-                {p.features.map(f => <li key={f}><Check size={13} /> {f}</li>)}
+                {lang === 'uz' && p.features.map(f => <li key={f}><Check size={13} /> {f}</li>)}
               </ul>
               {!cur && price != null && price > 0 && (
                 <div className="o2-row">

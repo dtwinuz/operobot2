@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArrowRight, Bot, Check, ChevronDown, Clock, KanbanSquare, Lock, Moon, PhoneOutgoing, ShieldCheck, Sparkles, Sun, Inbox as InboxIcon, Server, Languages } from 'lucide-react'
 import { t } from '../i18n'
-import { ChBadge, ChIcon, errText, num, useTheme, useToast } from '../lib'
+import { ChBadge, ChIcon, errText, LangSwitch, num, useTheme, useToast } from '../lib'
 import { openDemo } from '../demo'
 
 const L = t.landing
@@ -30,7 +30,7 @@ const FEED = [
   { ch: 'whatsapp', who: 'Nodira K.', text: 'Shartnoma bo‘yicha operator bilan gaplashsam bo‘ladimi?' },
   { ch: 'handoff', who: 'Tizim', text: 'Operatorga uzatildi · Mohira' },
 ]
-const COLS = ['Yangi', 'Qiziqdi', 'Uchrashuv', 'Yutildi']
+const COLS = t.landing.mock.cols
 
 function LiveMock() {
   const [n, setN] = useState(1)
@@ -103,6 +103,7 @@ export function Landing() {
           <a href="#faq" onClick={e => { e.preventDefault(); document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }) }}>{L.nav.faq}</a>
         </nav>
         <div className="o2-land-act">
+          <LangSwitch />
           <button className="o2-icon-btn" onClick={toggle} aria-label={t.common.theme}>{theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}</button>
           <a className="o2-btn ghost hide-sm" href="#/login">{L.login}</a>
           <a className="o2-btn dark" href="#/signup">{L.signup}</a>
@@ -166,7 +167,7 @@ export function Landing() {
         </div>
         <div className="o2-integr">
           <small>{L.integrations}</small>
-          {['Telegram', 'WhatsApp', 'Instagram', 'SMS', 'Sayt vidjeti', 'Google Sheets', 'amoCRM', 'Payme', 'Click', 'Claude (MCP)', 'SIP / Asterisk'].map(x => <span key={x}>{x}</span>)}
+          {['Telegram', 'WhatsApp', 'Instagram', 'SMS', t.channels.widget, 'Google Sheets', 'amoCRM', 'Payme', 'Click', 'Claude (MCP)', 'SIP / Asterisk'].map(x => <span key={x}>{x}</span>)}
         </div>
       </section>
 
@@ -222,7 +223,7 @@ function VisInbox() {
   )
 }
 function VisBoard() {
-  const cols = [{ n: 'Yangi', c: '#64748b', k: 4 }, { n: 'Qiziqdi', c: '#d97706', k: 6 }, { n: 'Uchrashuv', c: '#7c3aed', k: 3 }, { n: 'Yutildi', c: '#059669', k: 9 }]
+  const cols = [{ n: COLS[0], c: '#64748b', k: 4 }, { n: COLS[1], c: '#d97706', k: 6 }, { n: COLS[2], c: '#7c3aed', k: 3 }, { n: 'Yutildi', c: '#059669', k: 9 }]
   return (
     <div className="o2-vis o2-vis-board">
       {cols.map(c => (

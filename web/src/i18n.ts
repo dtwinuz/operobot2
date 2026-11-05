@@ -1,132 +1,27 @@
-// All UI strings live here (uz). Add `ru` / `en` objects with the same shape later.
-const uz = {
-  brand: 'operobot2',
-  common: {
-    save: 'Saqlash', cancel: 'Bekor qilish', create: 'Yaratish', delete: "O'chirish", edit: 'Tahrirlash', close: 'Yopish',
-    search: 'Qidirish…', loading: 'Yuklanmoqda…', empty: "Hozircha bo'sh", error: 'Xato', retry: 'Qayta urinish',
-    copy: 'Nusxa olish', copied: 'Nusxa olindi', saved: 'Saqlandi', som: "so'm", perMonth: "so'm/oy", unlimited: 'cheksiz',
-    yes: 'Ha', no: "Yo'q", all: 'Hammasi', name: 'Nomi', phone: 'Telefon', email: 'Email', role: 'Rol', status: 'Holat',
-    date: 'Sana', actions: 'Amallar', live: 'Jonli', theme: 'Mavzu', logout: 'Chiqish', demoChip: 'namuna narx',
-  },
-  roles: { owner: 'Egasi', admin: 'Admin', operator: 'Operator' } as Record<string, string>,
-  channels: { telegram: 'Telegram', whatsapp: 'WhatsApp', instagram: 'Instagram', sms: 'SMS', widget: 'Sayt vidjeti', manual: "Qo'lda", call: "Qo'ng'iroq" } as Record<string, string>,
-  interest: { yuqori: 'Yuqori', "o'rta": "O'rta", past: 'Past' } as Record<string, string>,
-  callStatus: {
-    queued: 'Navbatda', dialing: 'Terilmoqda', answered: "Ko'tardi", connected: 'Operatorga ulandi', no_answer: "Javob yo'q",
-    busy: 'Band', failed: 'Xato', declined: 'Rad etdi', blocked: "Qora ro'yxat", operator_busy: 'Operator band edi',
-  } as Record<string, string>,
-  campaignStatus: { draft: 'Qoralama', running: 'Ishlamoqda', paused: "To'xtatilgan", done: 'Tugadi' } as Record<string, string>,
-  landing: {
-    nav: { features: 'Imkoniyatlar', calls: "Qo'ng'iroqlar", pricing: 'Tariflar', faq: 'Savollar' },
-    login: 'Kirish', signup: "Ro'yxatdan o'tish", demo: 'Demoni ochish', demoBusy: 'Sandbox tayyorlanmoqda…',
-    eyebrow: 'Omnikanal inbox · AI agent · chiquvchi qo‘ng‘iroq',
-    h1a: 'Har bir murojaat —', h1b: 'mijozga aylanadi',
-    lead: "Telegram, WhatsApp, Instagram, SMS va saytdan kelgan xabarlar bitta inboxda. AI agent darhol javob beradi, lidni doskaga qo'yadi, kerak bo'lsa operatorga uzatadi. Ro'yxat bo'yicha chiquvchi qo'ng'iroq: mijoz «1» ni bossa — operator bilan gaplashadi.",
-    trust: ["Har tashkilot ma'lumoti alohida", "Qo'ng'iroqlar faqat 09:00–18:00", "AI o'zbek tilida javob beradi"],
-    demoNote: "Demo — sizga alohida sandbox tashkilot, 24 soatdan keyin o'chadi. Ro'yxatdan o'tish shart emas.",
-    channelsTitle: 'Hamma kanal bitta joyda',
-    sections: [
-      { id: 'inbox', tag: 'Inbox', title: 'Bitta oyna — barcha suhbatlar', text: "Har kanal xabari bir lentada: kim yozdi, qaysi kanal, kim javob beryapti. Filtrlar «O'qilmagan», «Meniki», «AI javob beryapti». Operator bir bosishda suhbatni AI'dan oladi.", points: ['AI qoralama: javobni bir bosishda tayyorlaydi', "Suhbat lid kartasiga bog'langan", 'Real vaqtda yangilanadi'] },
-      { id: 'board', tag: 'Doska', title: 'Lidlar yo‘qolmaydi', text: "Har murojaat va har qo'ng'iroq natijasi Kanban doskada: Yangi → Qiziqdi → Uchrashuv → Yutildi. AI xulosa, qiziqish darajasi va keyingi qadamni kartaga yozadi.", points: ['Sudrab o‘tkazish', 'Eslatma vaqti va mas’ul operator', 'Qiymat va voronka tahlili'] },
-      { id: 'agent', tag: 'AI agent', title: '24/7 javob beradigan xodim', text: "Agentga kompaniyangiz haqida yozing: narxlar, manzil, ish vaqti. U savollarga javob beradi, ism va telefonni oladi, uchrashuvga yozadi va murakkab savolda operatorni chaqiradi.", points: ['Ovozli va yozma agent', "Operatorga uzatish kalit so'zlari", 'Sinab ko‘rish oynasi'] },
-    ],
-    callsTag: "Chiquvchi qo'ng'iroq", callsTitle: "Ro'yxatga qo'ng'iroq — qonun doirasida",
-    callsText: "Telefonlar ro'yxatini yuklang: robot qo'ng'iroq qiladi, xabarni o'qiydi, mijoz «1» ni bossa — bo'sh operatorga ulaydi, «2» — rad. Natija lid kartasiga tushadi.",
-    callsLock: "2026-11-01 dan reklama qo'ng'iroqlari faqat 09:00–18:00 da ruxsat etiladi. Bu cheklov kodda qulflangan — tasodifan buzib bo'lmaydi.",
-    callsSteps: ["Ro'yxat", "Robot qo'ng'iroq qiladi", '«1» — operator', 'Natija doskada'],
-    moreTitle: 'Yana nimalar bor',
-    more: [
-      { t: 'Tahlil', d: "Kunlik murojaat, javob tezligi, qo'ng'iroq konversiyasi va voronka bir ekranda." },
-      { t: 'MCP va API', d: "Claude yoki ChatGPT'ga ulang: «bugungi issiq lidlar kim?» deb so'rang." },
-      { t: 'Jamoa', d: 'Egasi, admin va operator rollari. Har operator o‘z suhbatlarini ko‘radi.' },
-      { t: 'Tarif va to‘lov', d: 'Payme va Click orqali to‘lov, limitlar va foydalanish hisoblagichi.' },
-    ],
-    integrations: 'Integratsiyalar',
-    pricingTitle: 'Oddiy tariflar', pricingText: "Kichik biznes bepul boshlaydi. Kanal va operator ko'paysa — tarifni oshirasiz.",
-    priceAsk: 'kelishiladi', choose: 'Tanlash',
-    plans: [
-      { key: 'start', name: 'Start', price: 0, f: ['1 operator', '2 kanal', '300 xabar/oy', '100 AI javob/oy'] },
-      { key: 'biznes', name: 'Biznes', price: 149000, f: ['3 operator', '4 kanal', '5 000 xabar/oy', '2 000 AI javob/oy', "300 daqiqa qo'ng'iroq"] },
-      { key: 'pro', name: 'Pro', price: 449000, f: ['10 operator', 'Barcha kanallar', '30 000 xabar/oy', '15 000 AI javob/oy', "2 000 daqiqa qo'ng'iroq"] },
-      { key: 'korporativ', name: 'Korporativ', price: null as number | null, f: ['Cheksiz', 'Alohida server', 'SLA va shaxsiy menejer', "O'z SIP trunkingiz"] },
-    ],
-    faqTitle: 'Ko‘p beriladigan savollar',
-    faq: [
-      { q: 'Qaysi kanallar ulanadi?', a: "Telegram bot, WhatsApp Business (Cloud API), Instagram Direct, SMS shlyuz va saytingiz uchun chat vidjeti. Qo'ng'iroqlar SIP trunk orqali." },
-      { q: "Chiquvchi qo'ng'iroq qanday ishlaydi?", a: "Ro'yxat yuklaysiz, robot mahalliy SIP trunk orqali qo'ng'iroq qiladi. Faqat 09:00–18:00 (Toshkent) oralig'ida: bu qulf kodda." },
-      { q: "Ma'lumotlar qayerda saqlanadi?", a: "Har tashkilot ma'lumoti bazada alohida ajratilgan (row-level security). Ishchi muhit O'zbekistondagi serverda bo'ladi (ZRU-547)." },
-      { q: 'AI agent xato qilsa-chi?', a: "Agent bilmagan savolda yoki kalit so'z eshitganda suhbatni operatorga uzatadi. Operator istalgan payt suhbatni o'ziga oladi." },
-      { q: 'Demo nima?', a: "«Demoni ochish» sizga namuna ma'lumotli alohida tashkilot yaratadi: inbox, doska, qo'ng'iroqlar jonli ishlaydi. 24 soatdan keyin o'chadi." },
-    ],
-    finalTitle: 'Bugun sinab ko‘ring', finalText: 'Bir bosishda sandbox, kartasiz va ro‘yxatsiz.',
-    footer: 'operobot2 · AI sotuv va call-markaz platformasi',
-    mock: { inbox: 'Inbox', board: 'Doska', ai: 'AI javob berdi', handoff: 'Operatorga uzatildi' },
-  },
-  auth: {
-    loginTitle: 'Hisobga kirish', signupTitle: 'Yangi hisob', password: 'Parol', company: 'Kompaniya nomi', yourName: 'Ismingiz',
-    noAccount: "Hisobingiz yo'qmi?", haveAccount: 'Hisobingiz bormi?', orDemo: 'yoki demoni oching', submitLogin: 'Kirish', submitSignup: "Ro'yxatdan o'tish",
-    back: 'Bosh sahifa',
-  },
-  shell: {
-    nav: { dashboard: 'Bosh sahifa', inbox: 'Inbox', board: 'Doska', contacts: 'Kontaktlar', calls: "Qo'ng'iroqlar", agents: 'AI agentlar', channels: 'Kanallar', team: 'Jamoa', billing: 'Tarif', settings: 'Sozlamalar' },
-    demo: 'DEMO', demoNote: "sandbox 24 soatdan keyin o'chadi", menu: 'Menyu', switchOrg: 'Tashkilot',
-  },
-  dash: {
-    title: 'Bugun', inbound: 'Kiruvchi xabar', outbound: 'Javob berildi', aiReplies: 'AI javoblari', firstReply: 'Birinchi javob',
-    calls: "Qo'ng'iroqlar", connected: 'Operatorga ulandi', newLeads: 'Yangi lid', won: 'Yutildi', hourly: 'Soatlar kesimida',
-    byChannel: 'Kanallar bo‘yicha', funnel: 'Voronka', msgs: 'xabar', callsL: "qo'ng'iroq", sec: 's',
-  },
-  inbox: {
-    filters: { all: 'Hammasi', unread: "O'qilmagan", mine: 'Meniki', ai: 'AI' } as Record<string, string>,
-    pick: 'Suhbatni tanlang', placeholder: 'Javob yozing…', send: 'Yuborish', suggest: 'AI qoralama', modeAi: 'AI', modeHuman: 'Operator',
-    assignMe: 'Menga biriktirish', closeConv: 'Yopish', reopen: 'Qayta ochish', contact: 'Kontakt', lead: 'Lid', noLead: "Bog'langan lid yo'q",
-    assignee: "Mas'ul", aiMode: 'AI agent javob bermoqda', humanMode: 'Operator rejimi', author: { contact: 'Mijoz', ai: 'AI agent', user: 'Operator', system: 'Tizim' } as Record<string, string>,
-    failed: 'yuborilmadi', back: 'Orqaga', noConv: "Suhbatlar yo'q",
-  },
-  board: {
-    newLead: '+ Lid', title: 'Sarlavha', value: "Qiymat (so'm)", noCards: "Bo'sh", moveTo: "Bosqichga o'tkazish", next: 'Keyingi qadam', due: 'Eslatma',
-  },
-  contacts: { title: 'Kontaktlar', channel: 'Kanal', lastSeen: 'Oxirgi faollik', leads: 'Lidlar', tags: 'Teglar', conversations: 'Suhbatlar', calls: "Qo'ng'iroqlar", created: 'Qo‘shilgan', doNotCall: "Qora ro'yxat", doNotCallOn: "Qo'ng'iroq qilinmaydi", doNotCallOff: "Qo'ng'iroq mumkin", block: "Qora ro'yxatga qo'shish", unblock: "Qora ro'yxatdan chiqarish" },
-  calls: {
-    title: 'Kampaniyalar', create: 'Yangi kampaniya', name: 'Kampaniya nomi', agent: 'Ovozli agent', noAgent: "Agentsiz (yozilgan audio + 1/2)",
-    phones: 'Telefonlar (har qatorda bitta)', start: 'Boshlash', pause: "To'xtatish", total: 'Jami', called: 'Qilindi', answered: "Ko'tardi", connected: 'Ulandi',
-    log: "Qo'ng'iroqlar jurnali", duration: 'Davomiylik', summary: 'Xulosa', direction: "Yo'nalish", out: 'Chiquvchi', in: 'Kiruvchi',
-    lock: "Qonuniy oyna: reklama qo'ng'iroqlari faqat 09:00–18:00 (Toshkent), yakshanba va bayramda yo'q. Bu vaqtdan tashqari navbat avtomatik kutadi.",
-    count: 'ta raqam',
-    consent: "Ro'yxatdagi har bir mijoz qo'ng'iroq olishga rozilik bergan, buning uchun javobgarlikni tashkilot oladi",
-    skipped: "ta raqam qora ro'yxatda, kampaniyaga qo'shilmadi",
-  },
-  agents: {
-    title: 'AI agentlar', create: 'Yangi agent', kind: 'Turi', chat: 'Yozma', voice: 'Ovozli', enabled: 'Yoqilgan', greeting: 'Salomlashish',
-    prompt: "Ko'rsatma (kompaniya, narxlar, qoidalar)", handoff: "Operatorga uzatish kalit so'zlari (vergul bilan)", channels: 'Kanallar', voiceName: 'Ovoz',
-    test: "Sinab ko'rish", testPh: 'Mijoz nomidan yozing…', replies: 'javob', handoffs: 'uzatish', action: 'Harakat', extracted: 'Ajratilgan', pick: 'Agentni tanlang',
-    actions: { reply: 'Javob', handoff: 'Operatorga uzatish', close: 'Yakunlash' } as Record<string, string>,
-  },
-  channelsP: {
-    title: 'Kanallar', connect: 'Ulash', connected: 'Ulangan', demo: 'Demo', error: 'Xato', webhook: 'Webhook URL', widgetKey: 'Vidjet kaliti', embed: "Saytga qo'yish kodi",
-    none: 'Ulanmagan', remove: 'Uzish',
-    fields: { token: 'Bot token', phoneNumberId: 'Phone number ID', verifyToken: 'Verify token', pageId: 'Page ID', url: 'Shlyuz URL', from: "Jo'natuvchi nomi" } as Record<string, string>,
-    hints: {
-      telegram: '@BotFather dan olingan token. Webhook avtomatik o‘rnatiladi.',
-      whatsapp: 'Meta Business → WhatsApp Cloud API sozlamalaridan.',
-      instagram: 'Facebook sahifasiga ulangan Instagram professional akkaunt.',
-      sms: 'Har qanday HTTP SMS shlyuz (masalan Eskiz, Playmobile).',
-      widget: 'Saytingizga chat tugmasi. Kalit yaratilgach kodni nusxa oling.',
-    } as Record<string, string>,
-  },
-  team: { title: 'Jamoa', invite: 'Taklif qilish', tempPassword: 'Vaqtinchalik parol (faqat hozir ko‘rinadi)', lastSeen: 'Oxirgi kirish', you: 'siz', remove: 'Chiqarish' },
-  billing: {
-    title: 'Tarif va to‘lov', current: 'Joriy tarif', period: 'Davr', usage: 'Foydalanish', monthly: 'Oylik', yearly: 'Yillik −20%',
-    pay: 'To‘lash', paidDemo: "To'landi (demo)", invoices: 'Hisob-fakturalar', amount: 'Summa', provider: 'To‘lov tizimi', months: 'oy',
-    limits: { operators: 'Operatorlar', channels: 'Kanallar', messages: 'Xabarlar', aiReplies: 'AI javoblar', callMinutes: "Qo'ng'iroq daqiqasi" } as Record<string, string>,
-    invStatus: { pending: 'Kutilmoqda', paid: "To'langan", failed: 'Xato' } as Record<string, string>, currentChip: 'joriy', contact: 'Bog‘lanish',
-  },
-  settings: {
-    title: 'Sozlamalar', org: 'Tashkilot', timezone: 'Vaqt mintaqasi', workFrom: 'Ish boshlanishi', workTo: 'Ish tugashi',
-    apiKey: 'API kalit', createKey: 'Yangi kalit yaratish', keyOnce: "Kalit faqat bir marta ko'rsatiladi — hozir saqlab oling.", mcp: 'MCP ulanishi (Claude, ChatGPT)',
-    mcpHint: "Claude Desktop yoki boshqa MCP mijozga shu endpoint va kalitni bering.",
-  },
+// Picks the UI language. Strings are read once at startup, so changing language reloads the page.
+import { en } from './locales/en'
+import { ru } from './locales/ru'
+import { uz, type Dict } from './locales/uz'
+
+export type Lang = 'uz' | 'ru' | 'en'
+export const LANGS: { key: Lang; label: string }[] = [{ key: 'uz', label: "O'zbekcha" }, { key: 'ru', label: 'Русский' }, { key: 'en', label: 'English' }]
+const KEY = 'o2-lang'
+const DICTS: Record<Lang, Dict> = { uz, ru, en }
+
+function stored(): Lang {
+  try {
+    const v = localStorage.getItem(KEY)
+    if (v === 'uz' || v === 'ru' || v === 'en') return v
+  } catch { /* blocked storage: default language */ }
+  return 'uz'
 }
 
-export type Dict = typeof uz
-export const t: Dict = uz
+export const lang: Lang = stored()
+export const t: Dict = DICTS[lang]
+document.documentElement.lang = lang
+document.title = t.meta.title
+
+export function setLang(next: Lang): void {
+  try { localStorage.setItem(KEY, next) } catch { /* the page still reloads in the default language */ }
+  location.reload()
+}

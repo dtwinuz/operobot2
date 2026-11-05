@@ -20,7 +20,7 @@ API (auth, ko'p mijoz + RLS, inbox, doska, kontaktlar, kanallar, AI agent, kampa
 | 10 | Google Sheets import/sinxron, amoCRM | operobot'dagi kod qayta yoziladi |
 | 11 | Softphone (JsSIP) panelda, yozuv + transkript + xulosa | SIP trunk |
 | 12 | Follow-up: SMS eslatma, uchrashuvdan oldin xabar | 4 |
-| 13 | ru / en tarjima | — |
+| 13 | ✅ Interfeys ru / en. Qoldi: API xato matnlari, bazadagi ma'lumot (doska bosqichlari, demo namunalari), landing'dagi chat namunasi | — |
 | 14 | Home + Overview (dtwin.uz uslubidagi landing va stories-deck) | — |
 | 15 | Prod: O'zbekistondagi VPS, zaxira nusxa, monitoring | Server tanlovi |
 | 16 | Email (parolni tiklash, taklif xati) | SMTP |
