@@ -6,7 +6,7 @@ import { ping, tx } from "../db.js";
 import { parse, type Kind } from "../channels/adapters.js";
 import { channelBySecret, channelByWidget, handleInbound } from "../flow.js";
 import { finish, orgByDialerSecret } from "../voice/calls.js";
-import { payme, paymeAuthOk } from "../billing/pay.js";
+import { click, payme, paymeAuthOk } from "../billing/pay.js";
 import { orgByApiKey } from "../auth.js";
 import { mcp } from "../mcp.js";
 
@@ -72,6 +72,12 @@ export function publicRoutes(app: FastifyInstance, cfg: Config, version: string)
   app.post("/api/pay/payme", async (req, reply) => {
     if (!paymeAuthOk(cfg, req.headers.authorization)) return reply.send({ jsonrpc: "2.0", id: (req.body as { id?: unknown })?.id ?? null, error: { code: -32504, message: { uz: "Ruxsat yo'q", ru: "Net dostupa", en: "Unauthorized" } } });
     return payme(req.body as Record<string, any>);
+  });
+
+  // Click posts a form. The parser is scoped to this route, so session routes keep accepting JSON only.
+  void app.register(async (scope) => {
+    scope.addContentTypeParser("application/x-www-form-urlencoded", { parseAs: "string" }, (_req, body, done) => done(null, Object.fromEntries(new URLSearchParams(String(body)))));
+    scope.post("/api/pay/click", async (req) => click(cfg, (req.body ?? {}) as Record<string, string>));
   });
 
   app.post("/api/mcp", { config: { rateLimit: { max: 120, timeWindow: "1 minute" } } }, async (req, reply) => {

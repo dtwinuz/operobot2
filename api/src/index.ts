@@ -12,6 +12,7 @@ import { appRoutes } from "./routes/app.js";
 import { publicRoutes } from "./routes/public.js";
 import { startCampaignRunner } from "./voice/calls.js";
 import { startDemoSimulator } from "./demo.js";
+import { startPlanExpiry } from "./billing/pay.js";
 
 const cfg = loadConfig();
 const VERSION = process.env.REVISION ?? "dev";
@@ -37,6 +38,7 @@ appRoutes(app, cfg);
 publicRoutes(app, cfg, VERSION);
 
 startCampaignRunner();
+startPlanExpiry();
 if (cfg.DEMO) startDemoSimulator();
 
 await app.listen({ host: cfg.HOST, port: cfg.PORT });
