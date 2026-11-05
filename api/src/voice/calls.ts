@@ -8,11 +8,17 @@ import { config, applyExtracted } from "../flow.js";
 import { bump, fits, pushUsage } from "../billing/usage.js";
 import { getCall, getCampaign } from "../views.js";
 
-const tashHour = (now = new Date()) => new Date(now.getTime() + 5 * 3600_000).getUTCHours();
+// Same fixed days off as the operobot dialer (dialer/src/guard.ts). Hayit dates change yearly: HOLIDAYS in .env.
+const FIXED_HOLIDAYS = new Set(["01-01", "03-08", "03-21", "05-09", "09-01", "10-01", "12-08"]);
+const BLOCKED_NOTE = "Qora ro'yxatda: qo'ng'iroq qilinmadi";
+const STALE_MINUTES = { real: 30, demo: 5 }; // real: dialer's MAX_TALK_SEC is 30 min; demo: only a restart strands a call
 
-export function callWindowOpen(org: { demo: boolean; work_from: number; work_to: number }, now = new Date()): boolean {
+export function callWindowOpen(org: { demo: boolean; work_from: number; work_to: number }, now = new Date(), holidays = config()?.HOLIDAYS ?? ""): boolean {
   if (org.demo) return true; // simulated calls never reach a phone
-  const h = tashHour(now);
+  const tash = new Date(now.getTime() + 5 * 3600_000);
+  const day = tash.toISOString().slice(0, 10);
+  if (tash.getUTCDay() === 0 || FIXED_HOLIDAYS.has(day.slice(5)) || holidays.includes(day)) return false;
+  const h = tash.getUTCHours();
   return h >= Math.max(9, org.work_from) && h < Math.min(18, org.work_to);
 }
 
@@ -29,13 +35,8 @@ const SUMS = [
   "Operator bilan gaplashdi, taklifni oilasi bilan maslahatlashmoqchi.",
 ];
 
-/** One simulation step for a demo campaign call: queued → dialing → outcome. */
+/** One simulation step for a demo campaign call the runner has already claimed: dialing → outcome. */
 async function simulate(orgId: string, callId: string) {
-  await tx(orgId, async (q) => {
-    await q.exec("update calls set status = 'dialing', started_at = now() where id = $1", [callId]);
-    const c = await q.one<{ campaign_id: string }>("select campaign_id from calls where id = $1", [callId]);
-    await pushCall(q, orgId, callId, c.campaign_id);
-  });
   await new Promise((r) => setTimeout(r, 2500 + Math.random() * 3000));
   const roll = Math.random();
   const status = roll < 0.3 ? "no_answer" : roll < 0.38 ? "busy" : roll < 0.62 ? "declined" : roll < 0.7 ? "answered" : "connected";
@@ -43,13 +44,26 @@ async function simulate(orgId: string, callId: string) {
   await finish(orgId, callId, status, dur, status === "connected" ? pick(SUMS) : status === "declined" ? "Mijoz 2 ni bosdi: qiziqmaydi." : null);
 }
 
-/** Final state for a call (simulation or dialer webhook): usage, lead update, events. */
+/** Closes the campaign when nothing is left to dial. */
+async function settle(q: Q, orgId: string, campaignId: string) {
+  const left = await q.one<{ n: number }>("select count(*)::int n from calls where campaign_id = $1 and status in ('queued', 'dialing')", [campaignId]);
+  if (left.n) return;
+  if (await q.exec("update campaigns set status = 'done' where id = $1 and status <> 'done'", [campaignId])) emit(orgId, "campaign", await getCampaign(q, campaignId));
+}
+
+/**
+ * Final state for a call (simulation or dialer webhook): usage, lead update, events. Only an open call changes, so a
+ * repeated webhook cannot bill twice. 'queued' stays allowed: the result can beat our own bookkeeping after a retry.
+ */
 export async function finish(orgId: string, callId: string, status: string, durationSec: number, summary: string | null) {
   await tx(orgId, async (q) => {
-    const c = await q.one<{ campaign_id: string | null; contact_id: string; name: string }>(
-      "update calls k set status = $2, duration_sec = $3, summary = $4, ended_at = now() from contacts c where k.id = $1 and c.id = k.contact_id returning k.campaign_id, k.contact_id, c.name",
+    const c = await q.maybe<{ campaign_id: string | null; contact_id: string; name: string }>(
+      `update calls k set status = $2, duration_sec = $3, summary = $4, ended_at = now(), started_at = coalesce(k.started_at, now()) from contacts c
+       where k.id = $1 and c.id = k.contact_id and k.status in ('queued', 'dialing') returning k.campaign_id, k.contact_id, c.name`,
       [callId, status, durationSec, summary]);
+    if (!c) return;
     if (durationSec) await bump(q, orgId, "call_seconds", durationSec);
+    if (status === "declined") await q.exec("update contacts set do_not_call_at = coalesce(do_not_call_at, now()), do_not_call_reason = coalesce(do_not_call_reason, '2_bosdi') where id = $1", [c.contact_id]);
     if (status === "connected" || status === "declined") {
       const lead = (await q.maybe<{ id: string }>("select id from leads where contact_id = $1 order by created_at desc limit 1", [c.contact_id]))
         ?? await q.one<{ id: string }>("insert into leads(org_id, contact_id, stage_id, title, source) select $1, $2, id, $3, 'call' from stages where org_id = $1 and key = 'yangi' returning id", [orgId, c.contact_id, `${c.name} · qo'ng'iroq`]);
@@ -59,52 +73,86 @@ export async function finish(orgId: string, callId: string, status: string, dura
         : { interest: meeting ? "yuqori" : "o'rta", stage: meeting ? "uchrashuv" : "qiziqdi", summary: summary ?? undefined, meeting }, "qo'ng'iroq");
     }
     await pushCall(q, orgId, callId, c.campaign_id);
-    if (c.campaign_id) {
-      const left = await q.one<{ n: number }>("select count(*)::int n from calls where campaign_id = $1 and status in ('queued', 'dialing')", [c.campaign_id]);
-      if (!left.n) { await q.exec("update campaigns set status = 'done' where id = $1", [c.campaign_id]); emit(orgId, "campaign", await getCampaign(q, c.campaign_id)); }
-    }
+    if (c.campaign_id) await settle(q, orgId, c.campaign_id);
     await pushUsage(q, orgId);
   });
 }
 
-async function dial(orgId: string, call: { id: string; phone: string }, secret: string) {
+/** Asks the dialer to place a claimed call. Its result arrives later on POST /api/hooks/dialer/:secret. */
+async function dial(orgId: string, campaignId: string, call: { id: string; phone: string }, secret: string) {
   const cfg = config();
   const r = await fetch(`${cfg.DIALER_URL.replace(/\/$/, "")}/originate`, {
     method: "POST", signal: AbortSignal.timeout(10_000),
     headers: { "content-type": "application/json", authorization: `Bearer ${cfg.DIALER_TOKEN}` },
     body: JSON.stringify({ callId: call.id, phone: call.phone, callback: `${cfg.PUBLIC_URL.replace(/\/$/, "")}/api/hooks/dialer/${secret}` }),
-  }).catch((e: Error) => ({ ok: false, status: e.message }) as const);
-  await tx(orgId, async (q) => {
-    await q.exec("update calls set status = $2, started_at = now() where id = $1", [call.id, r.ok ? "dialing" : "failed"]);
-    const k = await q.one<{ campaign_id: string }>("select campaign_id from calls where id = $1", [call.id]);
-    await pushCall(q, orgId, call.id, k.campaign_id);
-  });
+  }).catch(() => null);
+  if (r?.ok) return;
+  // Only 400 and 422 refuse this number. Anything else (dialer down or busy, wrong token, older dialer without this
+  // route) says nothing about the number: keep it queued, or one bad setting would burn the whole list.
+  if (r?.status !== 400 && r?.status !== 422) {
+    retryAt.set(campaignId, Date.now() + RETRY_MS);
+    console.warn(`[qo'ng'iroq] dialer vaqtincha qabul qilmadi: ${r?.status ?? "javob yo'q"}`);
+    await tx(orgId, async (q) => {
+      await q.exec("update calls set status = 'queued', started_at = null where id = $1 and status = 'dialing'", [call.id]);
+      await pushCall(q, orgId, call.id, campaignId);
+    });
+    return;
+  }
+  const why = await r!.json().then((j: { error?: string }) => j.error).catch(() => undefined);
+  await finish(orgId, call.id, "failed", 0, `Dialer rad etdi: ${String(why ?? r!.status).slice(0, 200)}`);
 }
 
-const busy = new Set<string>(); // campaign ids with a call in flight (1 line per campaign in v0.1)
+const RETRY_MS = 15_000;
+const retryAt = new Map<string, number>(); // campaign id → do not ask the dialer again before this time
 
 /** Every 3 s: for each running campaign whose window is open, start the next queued call. */
 export function startCampaignRunner(): void {
   setInterval(() => void tick().catch((e) => console.warn("[kampaniya]", (e as Error).message)), 3000).unref();
 }
 
+/** A call whose result never came would hold its campaign's line forever. */
+async function reapStale() {
+  const stale = await tx(SYSTEM, (q) => q.many<{ id: string; org_id: string }>(
+    `select k.id, k.org_id from calls k join orgs o on o.id = k.org_id where k.status = 'dialing'
+     and k.started_at < now() - make_interval(mins => case when o.demo then $1::int else $2::int end)`, [STALE_MINUTES.demo, STALE_MINUTES.real]));
+  for (const k of stale) await finish(k.org_id, k.id, "failed", 0, "Dialer natija yubormadi");
+}
+
 async function tick() {
+  await reapStale();
+  // A real campaign without the consent confirmation never dials, even if something set it to running.
   const running = await tx(SYSTEM, (q) => q.many<{ id: string; org_id: string; demo: boolean; work_from: number; work_to: number; plan: string }>(
-    "select p.id, p.org_id, o.demo, o.work_from, o.work_to, o.plan from campaigns p join orgs o on o.id = p.org_id where p.status = 'running'"));
+    "select p.id, p.org_id, o.demo, o.work_from, o.work_to, o.plan from campaigns p join orgs o on o.id = p.org_id where p.status = 'running' and (o.demo or p.consent_at is not null)"));
   for (const p of running) {
-    if (busy.has(p.id) || !callWindowOpen(p)) continue;
+    if (!callWindowOpen(p) || (retryAt.get(p.id) ?? 0) > Date.now()) continue;
     if (!p.demo && !config().DIALER_URL) continue;
-    const next = await tx(p.org_id, async (q) => {
-      if (!(await fits(q, p.org_id, "callMinutes"))) { await q.exec("update campaigns set status = 'paused' where id = $1", [p.id]); emit(p.org_id, "campaign", await getCampaign(q, p.id)); return null; }
-      return q.maybe<{ id: string; phone: string }>(
-        `select k.id, c.phone from calls k join contacts c on c.id = k.contact_id
-         where k.campaign_id = $1 and k.status = 'queued' order by k.created_at limit 1`, [p.id]);
-    });
+    const next = await tx(p.org_id, (q) => claimNext(q, p.org_id, p.id));
     if (!next) continue;
-    busy.add(p.id);
-    const run = p.demo ? simulate(p.org_id, next.id) : dial(p.org_id, next, await dialerSecret(p.org_id));
-    void run.catch((e) => console.warn("[qo'ng'iroq]", (e as Error).message)).finally(() => busy.delete(p.id));
+    const run = p.demo ? simulate(p.org_id, next.id) : dial(p.org_id, p.id, next, await dialerSecret(p.org_id));
+    void run.catch((e) => console.warn("[qo'ng'iroq]", (e as Error).message));
   }
+}
+
+/** One line per campaign (v0.1): the next call starts only after the previous one has its result. */
+async function claimNext(q: Q, orgId: string, campaignId: string) {
+  if (await q.maybe("select 1 from calls where campaign_id = $1 and status = 'dialing' limit 1", [campaignId])) return null;
+  if (!(await fits(q, orgId, "callMinutes"))) {
+    await q.exec("update campaigns set status = 'paused' where id = $1", [campaignId]);
+    emit(orgId, "campaign", await getCampaign(q, campaignId));
+    return null;
+  }
+  const blocked = await q.many<{ id: string }>(
+    `update calls k set status = 'blocked', ended_at = now(), summary = $2 from contacts c
+     where k.campaign_id = $1 and k.status = 'queued' and c.id = k.contact_id
+       and exists (select 1 from contacts d where d.phone = c.phone and d.do_not_call_at is not null) returning k.id`, [campaignId, BLOCKED_NOTE]);
+  for (const b of blocked) emit(orgId, "call", await getCall(q, b.id));
+  const k = await q.maybe<{ id: string }>(
+    `update calls set status = 'dialing', started_at = now() where id = (
+       select id from calls where campaign_id = $1 and status = 'queued' order by created_at limit 1 for update skip locked) returning id`, [campaignId]);
+  if (!k) { await settle(q, orgId, campaignId); return null; }
+  await pushCall(q, orgId, k.id, campaignId);
+  const c = await q.one<{ phone: string }>("select c.phone from calls k join contacts c on c.id = k.contact_id where k.id = $1", [k.id]);
+  return { id: k.id, phone: c.phone };
 }
 
 /** Dialer webhook secret: `<orgId>.<orgs.hook_secret>` (random, stable, never shown in the UI). */

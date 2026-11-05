@@ -90,11 +90,16 @@ function NewCampaign({ agents, onClose, onDone }: { agents: Agent[]; onClose: ()
   const [name, setName] = useState('')
   const [agentId, setAgentId] = useState('')
   const [phones, setPhones] = useState('')
+  const [consent, setConsent] = useState(false)
   const [busy, setBusy] = useState(false)
   const list = phones.split(/\r?\n/).map(s => s.trim()).filter(Boolean)
   async function submit(e: FormEvent) {
     e.preventDefault(); setBusy(true)
-    try { onDone(await post<Campaign>('/campaigns', { name, agentId: agentId || undefined, phones: list })) } catch (er) { toast(errText(er), 'err') } finally { setBusy(false) }
+    try {
+      const c = await post<Campaign>('/campaigns', { name, agentId: agentId || undefined, phones: list, consent })
+      if (c.skipped) toast(`${c.skipped} ${C.skipped}`, 'err')
+      onDone(c)
+    } catch (er) { toast(errText(er), 'err') } finally { setBusy(false) }
   }
   return (
     <form className="o2-card o2-inline-form" onSubmit={submit}>
@@ -103,7 +108,8 @@ function NewCampaign({ agents, onClose, onDone }: { agents: Agent[]; onClose: ()
         <select value={agentId} onChange={e => setAgentId(e.target.value)}><option value="">{C.noAgent}</option>{agents.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}</select>
       </label>
       <label className="o2-field wide"><span>{C.phones} · {list.length} {C.count}</span><textarea required rows={5} className="o2-mono" placeholder={'+998 00 000 00 01\n+998 00 000 00 02'} value={phones} onChange={e => setPhones(e.target.value)} /></label>
-      <div className="o2-row end wide"><button type="button" className="o2-btn ghost sm" onClick={onClose}>{t.common.cancel}</button><button className="o2-btn primary sm" disabled={busy || !list.length}>{t.common.create}</button></div>
+      <label className="wide"><input type="checkbox" required checked={consent} onChange={e => setConsent(e.target.checked)} /> {C.consent}</label>
+      <div className="o2-row end wide"><button type="button" className="o2-btn ghost sm" onClick={onClose}>{t.common.cancel}</button><button className="o2-btn primary sm" disabled={busy || !list.length || !consent}>{t.common.create}</button></div>
     </form>
   )
 }

@@ -15,4 +15,5 @@
 
 - **Reklama qo'ng'iroqlari faqat 09:00–18:00** (2026-11-01 dan): `callWindowOpen`, haqiqiy tashkilot uchun o'chirib bo'lmaydi.
 - **Shaxsiy ma'lumot lokalizatsiyasi (ZRU-547)**: O'zbekiston fuqarolari ma'lumoti O'zbekistondagi serverda. Prod uchun mahalliy VPS kerak ([06](06-deploy.md)). LLM chet elda bo'lsa suhbat matni tashqariga chiqadi → mijoz roziligi va huquqshunos fikri kerak (operobot docs/07 bilan bir xil ochiq savol).
-- **Rozilik**: chiquvchi qo'ng'iroq ro'yxati faqat rozilik bergan mijozlardan bo'lishi kerak. Bu tashkilot javobgarligi, panelda ogohlantirish bor.
+- **Rozilik**: chiquvchi qo'ng'iroq ro'yxati faqat rozilik bergan mijozlardan bo'lishi kerak. Bu tashkilot javobgarligi: kampaniya yaratganda tasdiqlaydi, kim va qachon tasdiqlagani saqlanadi. Har bir raqam uchun alohida rozilik hali yo'q.
+- **Qora ro'yxat**: «2» bosgan yoki qo'lda qo'shilgan raqamga tashkilot ichida qo'ng'iroq ketmaydi ([05](05-modullar.md#qongiroqlar)).

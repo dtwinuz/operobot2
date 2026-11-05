@@ -23,7 +23,7 @@ export type Lead = {
 
 export type Contact = {
   id: string; name: string; phone: string | null; username: string | null; channel: ChannelKind | 'manual'
-  tags: string[]; createdAt: string; lastSeenAt: string | null; leads: number
+  tags: string[]; createdAt: string; lastSeenAt: string | null; leads: number; doNotCallAt: string | null
 }
 
 export type Conversation = {
@@ -55,10 +55,10 @@ export type AgentTest = {
 
 export type Campaign = {
   id: string; name: string; status: 'draft' | 'running' | 'paused' | 'done'; agentId: string | null
-  total: number; called: number; answered: number; connected: number; createdAt: string
+  total: number; called: number; answered: number; connected: number; createdAt: string; skipped?: number
 }
 
-export type CallStatus = 'queued' | 'dialing' | 'answered' | 'connected' | 'no_answer' | 'busy' | 'failed' | 'declined'
+export type CallStatus = 'queued' | 'dialing' | 'answered' | 'connected' | 'no_answer' | 'busy' | 'failed' | 'declined' | 'blocked'
 export type Call = {
   id: string; campaignId: string | null; direction: 'out' | 'in'; status: CallStatus; durationSec: number
   startedAt: string | null; summary: string | null; contact: { id: string; name: string; phone: string | null }
