@@ -4,7 +4,7 @@ O'zbekistondagi biznes uchun **AI sotuv va call-markaz SaaS**: barcha kanallarda
 
 | | |
 |---|---|
-| Holat | v0.1, lokal ishlaydi, demo deploy DNS kutmoqda — [STATUS](STATUS.md) |
+| Holat | v0.1, demo: https://operobot2.dtwin.uz — [STATUS](STATUS.md) |
 | Stek | Node 24 + TypeScript, Fastify, PostgreSQL 17 (RLS), React 19 + Vite |
 | Telefon | [`dtwinuz/operobot`](https://github.com/dtwinuz/operobot) dialer (Asterisk ARI) |
 

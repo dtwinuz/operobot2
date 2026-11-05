@@ -19,9 +19,9 @@ Migratsiyalar API ishga tushganda o'zi qo'llanadi. `http://localhost:4392/` → 
 
 1. Serverda `<dir>/.env` ni [`.env.example`](../.env.example) dan yarating (`DB_PASSWORD` majburiy).
 2. `bash deploy/deploy.sh <ssh-host> <dir>` — web build, fayllarni yuboradi, `docker compose up -d --build`.
-3. Tashqi TLS: edge Caddy `<domen> → operobot2-web:80` (dtwin VPS'da `dtwinuz/dtwin` edge PR orqali; `EDGE_NETWORK` default `dtwin-prod_default`).
+3. Tashqi TLS: edge Caddy `<domen> → operobot2-web:80` (dtwin VPS'da `dtwinuz/dtwin` edge PR orqali; `EDGE_NETWORK` default `dtwin-prod_default`). `operobot2-web` portini tashqariga ochmang: API mijoz IP'sini edge qo'ygan `X-Forwarded-For` dan oladi.
 
 | Muhit | Qayerda | Holat |
 |---|---|---|
-| Demo | dtwin VPS, `operobot2.dtwin.uz` | ⏳ DNS A yozuvi va edge route kerak |
+| Demo | dtwin VPS, https://operobot2.dtwin.uz | ✅ 11-05 dan ishlaydi (`/opt/operobot2`, edge route dtwinuz/dtwin#315) |
 | Prod | **O'zbekistondagi VPS** (ZRU-547) | ⏳ server tanlanmagan |
