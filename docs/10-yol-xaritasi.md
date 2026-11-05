@@ -15,7 +15,7 @@ API (auth, ko'p mijoz + RLS, inbox, doska, kontaktlar, kanallar, AI agent, kampa
 | 5 | LLM ulash, o'zbekcha javob sifatini baholash | API kalit, huquqshunos (ma'lumot chet elga chiqadi) |
 | 6 | ✅ Dialer kampaniya API: `POST /originate`, natija webhook (operobot #35). Haqiqiy qo'ng'iroqda sinash: SIP trunk | SIP trunk |
 | 7 | Ovozli AI agent ko'prigi (operobot #33 agent.ts) | 6 |
-| 8 | Payme sandbox testi, Click `Prepare/Complete` | Merchant akkauntlar |
+| 8 | Payme va Click rasmiy test muhitida sinash (kod yozilgan) | Merchant akkauntlar |
 | 9 | ✅ Kanal tokenlarini shifrlash ([07](07-xavfsizlik.md)) | — |
 | 10 | Google Sheets import/sinxron, amoCRM | operobot'dagi kod qayta yoziladi |
 | 11 | Softphone (JsSIP) panelda, yozuv + transkript + xulosa | SIP trunk |

@@ -30,4 +30,8 @@ sequenceDiagram
 |---|---|
 | Demo tashkilot | To'lov darhol «paid», tarif almashadi |
 | Payme | Merchant API (`Check/Create/Perform/Cancel/CheckTransaction`, `GetStatement`) yozilgan, lokal JSON-RPC bilan sinalgan. ⏳ Payme sandbox'da rasmiy test |
-| Click | Faqat to'lov havolasi. ⏳ `Prepare/Complete` callback |
+| Click | To'lov havolasi va SHOP API: `POST /api/pay/click` (`Prepare`, `Complete`), imzo `CLICK_SECRET_KEY`. Lokal sinalgan. ⏳ Click test muhitida rasmiy sinov |
+
+**Muddat.** Shu tarif uzaytirilsa qolgan vaqt saqlanadi. Boshqa tarifga o'tilganda yangi muddat shu kundan boshlanadi, eski tarifning qolgan vaqti ko'chmaydi. Muddat tugasa, soatlik tekshiruv tashkilotni `start` ga qaytaradi.
+
+**Qaytarish.** Payme to'lovni bekor qilsa, oldingi tarif va muddat tiklanadi. Keyinroq boshqa to'lov bo'lgan bo'lsa, faqat shu to'lovning oylari ayriladi.

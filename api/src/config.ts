@@ -19,6 +19,7 @@ const schema = z.object({
   PAYME_KEY: z.string().default(""), // merchant key: Basic auth "Paycom:<key>" on POST /api/pay/payme
   CLICK_SERVICE_ID: z.string().default(""),
   CLICK_MERCHANT_ID: z.string().default(""),
+  CLICK_SECRET_KEY: z.string().default(""), // SHOP API signature; Click checkout stays off without it
   // operobot dialer bridge (docs/05). Without it calls are simulated for demo orgs only.
   DIALER_URL: z.string().default(""),
   DIALER_TOKEN: z.string().default(""),
