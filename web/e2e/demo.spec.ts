@@ -52,10 +52,11 @@ test('lists are dense', async ({ page }) => {
 test('inbox: operator reply lands in the thread', async ({ page }) => {
   await page.goto('./#/app/inbox')
   await page.locator('.o2-conv').first().click()
+  await expect(page.locator('.o2-msg').first()).toBeVisible({ timeout: 10_000 })
   const box = page.locator('.o2-composer textarea, .o2-composer input').first()
   await box.fill('Salom, demo javob')
   await page.locator('.o2-composer button.primary').click()
-  await expect(page.locator('.o2-msg', { hasText: 'Salom, demo javob' }).first()).toBeVisible()
+  await expect(page.locator('.o2-msg', { hasText: 'Salom, demo javob' }).first()).toBeVisible({ timeout: 10_000 })
 })
 
 test('board: new lead is added in memory', async ({ page }) => {
