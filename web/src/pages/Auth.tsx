@@ -6,10 +6,12 @@ import { t } from '../i18n'
 import { errText, go, useToast } from '../lib'
 import { openDemo } from '../demo'
 
+const DEMO = import.meta.env.MODE === 'demo'
+
 export function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
   const A = t.auth
   const toast = useToast()
-  const [f, setF] = useState({ name: '', email: '', password: '', company: '' })
+  const [f, setF] = useState(DEMO ? { name: 'Aziza Rahimova', email: 'demo@namuna.uz', password: 'demo', company: 'Namuna Servis' } : { name: '', email: '', password: '', company: '' })
   const [busy, setBusy] = useState(false)
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF(x => ({ ...x, [k]: e.target.value }))
 
@@ -28,7 +30,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
       <div className="o2-land-bg" aria-hidden="true"><i /><i /><i /></div>
       <form className="o2-auth-card" onSubmit={submit}>
         <a className="o2-auth-back" href="#/"><ArrowLeft size={14} /> {A.back}</a>
-        <a className="o2-logo" href="#/"><img src="/favicon.svg" alt="" width={26} height={26} /><b>operobot</b><i>2</i></a>
+        <a className="o2-logo" href="#/"><img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width={26} height={26} /><b>operobot</b><i>2</i></a>
         <h1>{mode === 'login' ? A.loginTitle : A.signupTitle}</h1>
         {mode === 'signup' && <>
           <label className="o2-field"><span>{A.yourName}</span><input required value={f.name} onChange={set('name')} autoComplete="name" /></label>
@@ -36,6 +38,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
         </>}
         <label className="o2-field"><span>{t.common.email}</span><input required type="email" value={f.email} onChange={set('email')} autoComplete="email" /></label>
         <label className="o2-field"><span>{A.password}</span><input required type="password" minLength={mode === 'signup' ? 8 : 1} value={f.password} onChange={set('password')} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} /></label>
+        {DEMO && <p className="o2-auth-alt">Demo: <b>demo@namuna.uz</b> / <b>demo</b></p>}
         <button className="o2-btn primary lg" disabled={busy}>{busy ? t.common.loading : mode === 'login' ? A.submitLogin : A.submitSignup}</button>
         <p className="o2-auth-alt">
           {mode === 'login' ? <>{A.noAccount} <a href="#/signup">{t.landing.signup}</a></> : <>{A.haveAccount} <a href="#/login">{t.landing.login}</a></>}

@@ -7,7 +7,7 @@ import { openDemo } from '../demo'
 const L = t.landing
 
 function Logo() {
-  return <a className="o2-logo" href="#/"><img src="/favicon.svg" alt="" width={26} height={26} /><b>operobot</b><i>2</i></a>
+  return <a className="o2-logo" href="#/"><img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width={26} height={26} /><b>operobot</b><i>2</i></a>
 }
 
 function DemoButton({ big }: { big?: boolean }) {
