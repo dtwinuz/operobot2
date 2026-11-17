@@ -11,3 +11,9 @@
 Sayt vidjeti demo'da ham haqiqiy: Kanallar → Sayt vidjeti → kodni istalgan sahifaga qo'ysangiz, yozilgan xabar inbox'ga tushadi va AI javob beradi.
 
 Cheklov: har IP soatiga 10 ta sandbox. Demo foydalanuvchi parol bilan kira olmaydi (faqat shu cookie).
+
+## Statik demo (backend'siz)
+
+`cd web && npm run build:demo` → `web/dist-demo/`, base `/demo/operobot2/` ([jonli](https://wonmor.io/demo/operobot2/)). Xuddi shu panel, lekin `/api` va SSE brauzer xotirasidan javob beradi (`web/src/mock`: 48 kontakt, 30+ suhbat, 34 lid, 6 kampaniya, 120+ qo'ng'iroq, 5 agent, 6 kanal, 8 a'zo, hisob-fakturalar). Vaqtlar `Date.now()` ga nisbatan, o'zgarishlar qayta yuklanganda tiklanadi. Demo kodi faqat `--mode demo` da dinamik yuklanadi, oddiy `npm run build` ga kirmaydi.
+
+- `npm run serve:demo` — lokal ko'rish, `npm run test:demo` — smoke e2e, `npm run site:screenshots` — `docs/screenshots/`.

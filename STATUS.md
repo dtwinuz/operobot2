@@ -8,6 +8,7 @@
 | 2026-11-05 | Dialer ko'prigi: `operator_busy` holati, operobot kampaniya API bilan soxta Asterisk'da sinaldi | #22 |
 | 2026-11-05 | Click SHOP API, tarif muddati tugashi, Payme qaytarishida tarif tiklanishi | #23 |
 | 2026-11-05 | Interfeys uz / ru / en, til tanlash panel va landing'da | #24 |
+| 2026-11-17 | Statik jonli demo (`--mode demo`, xotiradagi API), skrinshotlar, demo smoke e2e, README | — |
 
 ## Hozirgi holat
 

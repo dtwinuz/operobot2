@@ -77,7 +77,7 @@ export default function Shell({ path }: { path: string }) {
       <div className={`o2-shell${drawer ? ' drawer' : ''}`}>
         <aside className="o2-side">
           <div className="o2-side-h">
-            <a className="o2-logo" href="#/app"><img src="/favicon.svg" alt="" width={24} height={24} /><b>operobot</b><i>2</i></a>
+            <a className="o2-logo" href="#/app"><img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width={24} height={24} /><b>operobot</b><i>2</i></a>
             <button className="o2-icon-btn show-sm" onClick={() => setDrawer(false)} aria-label={t.common.close}><X size={18} /></button>
           </div>
           <nav className="o2-nav">
