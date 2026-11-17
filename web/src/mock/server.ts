@@ -5,6 +5,8 @@ import { AGENTS, CALLS, CAMPAIGNS, CHANNELS, CONTACTS, CONVS, INVOICES, LEADS, M
 
 const iso = () => new Date().toISOString()
 const clone = <T>(x: T): T => structuredClone(x)
+/** Random lowercase token for the fake temp password and API key the demo shows (never used for auth). */
+const rnd = (len: number) => Array.from(crypto.getRandomValues(new Uint8Array(len)), b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join('')
 
 /* ---------- session ---------- */
 let signedIn = true
@@ -358,7 +360,7 @@ async function route(method: string, path: string, q: URLSearchParams, body: Bod
       if (MEMBERS.some(m => m.email === body.email)) throw new HttpError(409, "Bu email allaqachon jamoada")
       const m: Member = { userId: id('u'), name: String(body.name), email: String(body.email), role: body.role === 'admin' ? 'admin' : 'operator', lastSeenAt: null }
       MEMBERS.push(m); USAGE.operators = MEMBERS.length - 1
-      return { member: m, tempPassword: `Demo-${Math.random().toString(36).slice(2, 8)}` }
+      return { member: m, tempPassword: `Demo-${rnd(6)}` }
     }
     case 'PATCH members/:b': { const m = need(MEMBERS.find(x => x.userId === b)); if (body.role === 'admin' || body.role === 'operator') m.role = body.role; return m }
     case 'DELETE members/:b': { const i = MEMBERS.findIndex(x => x.userId === b); if (i > 0) MEMBERS.splice(i, 1); USAGE.operators = MEMBERS.length - 1; return { ok: true } }
@@ -372,7 +374,7 @@ async function route(method: string, path: string, q: URLSearchParams, body: Bod
     }
     case 'GET settings': return settings
     case 'PATCH settings': Object.assign(settings, body); return settings
-    case 'POST settings/:b': { const key = `ob2_${Math.random().toString(36).slice(2, 6)}_${Math.random().toString(36).slice(2, 14)}demo`; settings.apiKeyPrefix = key.slice(0, 8); settings.apiKeyAt = iso(); return { key } }
+    case 'POST settings/:b': { const key = `ob2_${rnd(4)}_${rnd(12)}demo`; settings.apiKeyPrefix = key.slice(0, 8); settings.apiKeyAt = iso(); return { key } }
   }
   throw new HttpError(404, `demo: ${method} ${path} yo'q`)
 }
